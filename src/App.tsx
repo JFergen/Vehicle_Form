@@ -44,6 +44,7 @@ const CarForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchCarInfo = async (vin: string) => {
+    console.log(loading) // TODO: Get rid of this
     setLoading(true);
     try {
       const response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${vin}?format=json`);
