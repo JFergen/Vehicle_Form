@@ -148,7 +148,7 @@ const CarForm: React.FC = () => {
     if (!validateSecondStep()) return;
 
     try {
-      await axios.post('http://localhost:5000/send-email', formData);
+      await axios.post(`${process.env.REACT_APP_API_TO_CALL}/send-email`, formData);
       alert('Form submitted successfully!');
     } catch (error) {
       alert('Error submitting form!');
