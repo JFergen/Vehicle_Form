@@ -6,8 +6,8 @@ import { styled } from '@mui/material/styles';
 // TODO
 // 1. Onblur of VIN, should check to see if it is valid. If not, show error text
 // 2. When valid VIN is entered, start API and have NEXT button turn into a loading icon. It is is valid info then enable the button, if not then show toast message.
-// 3. Cool and hip UI
-// 4. Setup QA environment with free hosting
+// 3. When inputting make/model, have list of all potential makes and then based on that, have list of all potential models
+// 4. Cool and hip UI
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   marginBottom: theme.spacing(2),
@@ -106,9 +106,9 @@ const CarForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+console.log(process.env.REACT_APP_API_TO_CALL)
     try {
-      await axios.post('http://localhost:5000/send-email', formData);
+      await axios.post(`${process.env.REACT_APP_API_TO_CALL}/send-email`, formData);
       alert('Form submitted successfully!');
     } catch (error) {
       alert('Error submitting form!');
