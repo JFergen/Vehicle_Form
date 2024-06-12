@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Card, CardContent, TextField, Button, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Container, Card, CardContent, TextField, Button, Typography, ToggleButton, ToggleButtonGroup, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 // TODO
@@ -39,26 +39,35 @@ const CarForm: React.FC = () => {
     licensePlate: '',
     email: '',
   });
-  const [selection, setSelection] = useState('licensePlate');
+  const [selection, setSelection] = useState('vin');
   const [formErrors, setFormErrors] = useState('');
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(1)
 
-  const fetchCarInfo = async (vin: string) => {
-    console.log(loading) // TODO: Get rid of this
+  const fetchCarInfo = async (type: string, value: string) => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${vin}?format=json`);
-      const { Make, Model, ModelYear, ErrorCode } = response.data.Results[0];
+      let response
 
-      if (ErrorCode !== '0') {
-        console.log(ErrorCode);
+      if (type === 'vin') {
+        response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${value}?format=json`);
+        const { ErrorCode } = response.data.Results[0];
+
+        if (ErrorCode !== '0') {
+          console.log(ErrorCode);
+        }
+      } else {
+        response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${value}?format=json`);
       }
+      
+      const { Make, Model, ModelYear } = response.data.Results[0];
 
       setFormData({
         ...formData,
         carModel: Model,
         carMake: Make,
         carYear: ModelYear,
+        [type]: value
       });
     } catch (error) {
       setFormErrors('Unable to fetch car information. Please check the VIN.');
@@ -68,14 +77,16 @@ const CarForm: React.FC = () => {
   };
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
 
-    if (e.target.name === 'vin' && e.target.value.length === 17) {
-      await fetchCarInfo(e.target.value);
-    }
+    // if (name === 'vin' && value.length === 17) {
+    //   await fetchCarInfo(name, value);
+    // }
   };
 
   const handleSelectionChange = (event: React.MouseEvent<HTMLElement>, newSelection: string) => {
@@ -90,25 +101,54 @@ const CarForm: React.FC = () => {
     }
   };
 
-  const validateForm = () => {
+  const validateFirstStep = () => {
     if (selection === 'vin' && !formData.vin) {
       setFormErrors('VIN is required');
       return false;
     }
+
     if (selection === 'licensePlate' && !formData.licensePlate) {
       setFormErrors('License Plate is required');
       return false;
     }
+
     setFormErrors('');
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const validateSecondStep = () => {
+    if (!formData.ownerName) {
+      setFormErrors('Owner Name is required');
+      return false;
+    }
+
+    if (!formData.email) {
+      setFormErrors('Email is required');
+      return false;
+    }
+
+    setFormErrors('');
+    return true;
+  };
+
+  const handleFirstStepSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!validateForm()) return;
-console.log(process.env.REACT_APP_API_TO_CALL)
+    if (!validateFirstStep()) return;
+
+    const identifier = selection === 'vin' ? formData.vin : formData.licensePlate;
+    const type = selection === 'vin' ? 'vin' : 'licensePlate';
+
+    await fetchCarInfo(type, identifier);
+
+    setStep(2);
+  };
+
+  const handleSecondStepSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!validateSecondStep()) return;
+
     try {
-      await axios.post(`${process.env.REACT_APP_API_TO_CALL}/send-email`, formData);
+      await axios.post('http://localhost:5000/send-email', formData);
       alert('Form submitted successfully!');
     } catch (error) {
       alert('Error submitting form!');
@@ -122,97 +162,116 @@ console.log(process.env.REACT_APP_API_TO_CALL)
           <Typography variant="h5" component="h2" gutterBottom>
             Car Information Form
           </Typography>
-          <StyledToggleButtonGroup
-            value={selection}
-            exclusive
-            onChange={handleSelectionChange}
-            aria-label="car information selection"
-          >
-            <ToggleButton value="licensePlate" aria-label="license plate">
-              License Plate
-            </ToggleButton>
-            <ToggleButton value="vin" aria-label="vin">
-              VIN
-            </ToggleButton>
-          </StyledToggleButtonGroup>
-          <form onSubmit={handleSubmit}>
-            {/* <TextField
-              label="Owner Name"
-              name="ownerName"
-              value={formData.ownerName}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              required
-            /> */}
-            {selection === 'vin' && (
+          {step === 1 &&
+            <>
+              <StyledToggleButtonGroup
+                value={selection}
+                exclusive
+                onChange={handleSelectionChange}
+                aria-label="car information selection"
+              >
+                <ToggleButton value="vin" aria-label="vin">
+                  VIN
+                </ToggleButton>
+                <ToggleButton value="licensePlate" aria-label="license plate">
+                  License Plate
+                </ToggleButton>     
+              </StyledToggleButtonGroup>
+              <form onSubmit={handleFirstStepSubmit}>
+                {selection === 'vin' && (
+                  <TextField
+                    label="VIN"
+                    name="vin"
+                    value={formData.vin}
+                    onChange={handleChange}
+                    fullWidth
+                    margin="normal"
+                    required
+                    error={!!formErrors}
+                    helperText={formErrors}
+                  />
+                )}
+                {selection === 'licensePlate' && (
+                  <TextField
+                    label="License Plate"
+                    name="licensePlate"
+                    value={formData.licensePlate}
+                    onChange={handleChange}
+                    fullWidth
+                    margin="normal"
+                    required
+                    error={!!formErrors}
+                    helperText={formErrors}
+                  />
+                )}
+                {loading ? (
+                  <CircularProgress />
+                ) : (
+                  <Button type="submit" variant="contained" color="primary" fullWidth>
+                    Next
+                  </Button>
+                )}      
+              </form>
+            </>
+          }
+          {step === 2 &&
+            <form onSubmit={handleSecondStepSubmit}>
               <TextField
-                label="VIN"
-                name="vin"
-                value={formData.vin}
+                label="Name"
+                name="ownerName"
+                value={formData.ownerName}
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
                 required
-                error={!!formErrors}
-                helperText={formErrors}
               />
-            )}
-            {selection === 'licensePlate' && (
               <TextField
-                label="License Plate"
-                name="licensePlate"
-                value={formData.licensePlate}
+                label="Email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                type="email"
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Car Model"
+                name="carModel"
+                value={formData.carModel}
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
                 required
-                error={!!formErrors}
-                helperText={formErrors}
               />
-            )}
-            {/* <TextField
-              label="Car Model"
-              name="carModel"
-              value={formData.carModel}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              required
-            />
-            <TextField
-              label="Car Year"
-              name="carYear"
-              value={formData.carYear}
-              onChange={handleChange}
-              type="number"
-              fullWidth
-              margin="normal"
-              required
-            />
-            <TextField
-              label="Car Make"
-              name="carMake"
-              value={formData.carMake}
-              onChange={handleChange}
-              fullWidth
-              margin="normal"
-              required
-            />
-            <TextField
-              label="Email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              type="email"
-              fullWidth
-              margin="normal"
-              required
-            /> */}
-            <Button type="submit" variant="contained" color="primary" fullWidth>
-              Submit
-            </Button>
-          </form>
+              <TextField
+                label="Car Year"
+                name="carYear"
+                value={formData.carYear}
+                onChange={handleChange}
+                type="number"
+                fullWidth
+                margin="normal"
+                required
+              />
+              <TextField
+                label="Car Make"
+                name="carMake"
+                value={formData.carMake}
+                onChange={handleChange}
+                fullWidth
+                margin="normal"
+                required
+              />
+              {loading ? (
+                <CircularProgress />
+              ) : (
+                <Button type="submit" variant="contained" color="primary" fullWidth>
+                  Submit
+                </Button>
+              )}
+            </form>
+          }
         </CardContent>
       </Card>
     </Container>
