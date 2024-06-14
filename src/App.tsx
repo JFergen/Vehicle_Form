@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Card, CardContent, TextField, Button, Typography, ToggleButton, ToggleButtonGroup, CircularProgress } from '@mui/material';
+import { Container, Card, CardContent, TextField, Button, ToggleButton, ToggleButtonGroup, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { Snackbar, Alert } from '@mui/material'; // For toast messages
 
 // TODO
-// 1. Onblur of VIN, should check to see if it is valid. If not, show error text
 // 2. When valid VIN is entered, start API and have NEXT button turn into a loading icon. It is is valid info then enable the button, if not then show toast message.
 // 3. When inputting make/model, have list of all potential makes and then based on that, have list of all potential models
 // 4. Cool and hip UI
+// 5. Back button on 2nd page
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   marginBottom: theme.spacing(2),
@@ -21,10 +22,7 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
       color: theme.palette.primary.contrastText,
     },
     '&.MuiToggleButton-root': {
-      border: `1px solid ${theme.palette.divider}`,
-      '&:hover': {
-        backgroundColor: theme.palette.action.hover,
-      },
+      border: `1px solid ${theme.palette.divider}`
     },
   },
 }));
@@ -43,6 +41,8 @@ const CarForm: React.FC = () => {
   const [formErrors, setFormErrors] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1)
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const fetchCarInfo = async (type: string, value: string) => {
     setLoading(true);
@@ -55,8 +55,14 @@ const CarForm: React.FC = () => {
 
         if (ErrorCode !== '0') {
           console.log(ErrorCode);
+          setFormErrors(`Unable to fetch car information. Please check the ${selection === 'vin' ? 'VIN' : 'License Plate'}.`);
+          setSnackbarMessage(`Invalid ${selection === 'vin' ? 'VIN' : 'License Plate'} entered`);
+          setSnackbarOpen(true);
+        } else {
+          setStep(2);
         }
       } else {
+        // TODO:: License plate API
         response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${value}?format=json`);
       }
       
@@ -70,7 +76,10 @@ const CarForm: React.FC = () => {
         [type]: value
       });
     } catch (error) {
-      setFormErrors('Unable to fetch car information. Please check the VIN.');
+      console.log(error);
+      setFormErrors(`Unable to fetch car information. Please check the ${selection === 'vin' ? 'VIN' : 'License Plate'}.`);
+      setSnackbarMessage(`Invalid ${selection === 'vin' ? 'VIN' : 'License Plate'} entered`);
+      setSnackbarOpen(true);
     } finally {
       setLoading(false);
     }
@@ -83,10 +92,6 @@ const CarForm: React.FC = () => {
       ...formData,
       [name]: value,
     });
-
-    // if (name === 'vin' && value.length === 17) {
-    //   await fetchCarInfo(name, value);
-    // }
   };
 
   const handleSelectionChange = (event: React.MouseEvent<HTMLElement>, newSelection: string) => {
@@ -139,8 +144,6 @@ const CarForm: React.FC = () => {
     const type = selection === 'vin' ? 'vin' : 'licensePlate';
 
     await fetchCarInfo(type, identifier);
-
-    setStep(2);
   };
 
   const handleSecondStepSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -156,125 +159,138 @@ const CarForm: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Card>
-        <CardContent>
-          <Typography variant="h5" component="h2" gutterBottom>
-            Car Information Form
-          </Typography>
-          {step === 1 &&
-            <>
-              <StyledToggleButtonGroup
-                value={selection}
-                exclusive
-                onChange={handleSelectionChange}
-                aria-label="car information selection"
-              >
-                <ToggleButton value="vin" aria-label="vin">
-                  VIN
-                </ToggleButton>
-                <ToggleButton value="licensePlate" aria-label="license plate">
-                  License Plate
-                </ToggleButton>     
-              </StyledToggleButtonGroup>
-              <form onSubmit={handleFirstStepSubmit}>
-                {selection === 'vin' && (
-                  <TextField
-                    label="VIN"
-                    name="vin"
-                    value={formData.vin}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                    required
-                    error={!!formErrors}
-                    helperText={formErrors}
-                  />
-                )}
-                {selection === 'licensePlate' && (
-                  <TextField
-                    label="License Plate"
-                    name="licensePlate"
-                    value={formData.licensePlate}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                    required
-                    error={!!formErrors}
-                    helperText={formErrors}
-                  />
-                )}
+      <Container maxWidth="sm">
+        <Card>
+          <CardContent>
+            {step === 1 &&
+              <>
+                <StyledToggleButtonGroup
+                  value={selection}
+                  exclusive
+                  onChange={handleSelectionChange}
+                  aria-label="car information selection"
+                >
+                  <ToggleButton value="vin" aria-label="vin">
+                    VIN
+                  </ToggleButton>
+                  <ToggleButton value="licensePlate" aria-label="license plate">
+                    License Plate
+                  </ToggleButton>     
+                </StyledToggleButtonGroup>
+                <form onSubmit={handleFirstStepSubmit}>
+                  {selection === 'vin' && (
+                    <TextField
+                      label="VIN"
+                      name="vin"
+                      value={formData.vin}
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      required
+                      error={!!formErrors}
+                      helperText={formErrors}
+                      onBlur={() => {
+                        if (formData.vin.length > 0 && formData.vin.length !== 17) {
+                          setFormErrors('VIN must be 17 characters long');
+                        } else {
+                          setFormErrors('');
+                        }
+                      }}
+                    />
+                  )}
+                  {selection === 'licensePlate' && (
+                    <TextField
+                      label="License Plate"
+                      name="licensePlate"
+                      value={formData.licensePlate}
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      required
+                      error={!!formErrors}
+                      helperText={formErrors}
+                    />
+                  )}
+                  {loading ? (
+                    <CircularProgress />
+                  ) : (
+                    <Button type="submit" variant="contained" color="primary" fullWidth>
+                      Next
+                    </Button>
+                  )}      
+                </form>
+              </>
+            }
+            {step === 2 &&
+              <form onSubmit={handleSecondStepSubmit}>
+                <TextField
+                  label="Name"
+                  name="ownerName"
+                  value={formData.ownerName}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
+                  required
+                />
+                <TextField
+                  label="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  type="email"
+                  fullWidth
+                  margin="normal"
+                  required
+                />
+                <TextField
+                  label="Car Model"
+                  name="carModel"
+                  value={formData.carModel}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
+                  required
+                />
+                <TextField
+                  label="Car Year"
+                  name="carYear"
+                  value={formData.carYear}
+                  onChange={handleChange}
+                  type="number"
+                  fullWidth
+                  margin="normal"
+                  required
+                />
+                <TextField
+                  label="Car Make"
+                  name="carMake"
+                  value={formData.carMake}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
+                  required
+                />
                 {loading ? (
                   <CircularProgress />
                 ) : (
                   <Button type="submit" variant="contained" color="primary" fullWidth>
-                    Next
+                    Submit
                   </Button>
-                )}      
+                )}
               </form>
-            </>
-          }
-          {step === 2 &&
-            <form onSubmit={handleSecondStepSubmit}>
-              <TextField
-                label="Name"
-                name="ownerName"
-                value={formData.ownerName}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
-              />
-              <TextField
-                label="Email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                type="email"
-                fullWidth
-                margin="normal"
-                required
-              />
-              <TextField
-                label="Car Model"
-                name="carModel"
-                value={formData.carModel}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
-              />
-              <TextField
-                label="Car Year"
-                name="carYear"
-                value={formData.carYear}
-                onChange={handleChange}
-                type="number"
-                fullWidth
-                margin="normal"
-                required
-              />
-              <TextField
-                label="Car Make"
-                name="carMake"
-                value={formData.carMake}
-                onChange={handleChange}
-                fullWidth
-                margin="normal"
-                required
-              />
-              {loading ? (
-                <CircularProgress />
-              ) : (
-                <Button type="submit" variant="contained" color="primary" fullWidth>
-                  Submit
-                </Button>
-              )}
-            </form>
-          }
-        </CardContent>
-      </Card>
-    </Container>
+            }
+          </CardContent>
+        </Card>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
+        >
+          <Alert onClose={() => setSnackbarOpen(false)} severity="error" sx={{ width: '100%' }}>
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Container>
   );
 };
 
