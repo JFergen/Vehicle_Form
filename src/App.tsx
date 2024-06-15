@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Card, CardContent, TextField, Button, ToggleButton, ToggleButtonGroup, CircularProgress } from '@mui/material';
+import { Container, Card, CardContent, TextField, Button, ToggleButton, ToggleButtonGroup, CircularProgress, Select, MenuItem, InputLabel, FormControl, SelectChangeEvent } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Snackbar, Alert } from '@mui/material'; // For toast messages
 
 // TODO
-// 2. License Plate API
 // 3. When inputting make/model, have list of all potential makes and then based on that, have list of all potential models
 // 4. Cool and hip UI
-// 5. Back button on 2nd page
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   marginBottom: theme.spacing(2),
@@ -20,9 +18,12 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     '&.Mui-selected': {
       backgroundColor: theme.palette.primary.main,
       color: theme.palette.primary.contrastText,
+      '&:hover': {
+        backgroundColor: theme.palette.primary.main,
+      },
     },
     '&.MuiToggleButton-root': {
-      border: `1px solid ${theme.palette.divider}`
+      border: `1px solid ${theme.palette.divider}`,
     },
   },
 }));
@@ -35,6 +36,7 @@ const CarForm: React.FC = () => {
     carMake: '',
     vin: '',
     licensePlate: '',
+    state: '',
     email: '',
   });
   const [selection, setSelection] = useState('vin');
@@ -44,45 +46,130 @@ const CarForm: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
-  const fetchCarInfo = async (type: string, value: string) => {
+  const states = [
+    { label: 'Alabama', value: 'AL' },
+    { label: 'Alaska', value: 'AK' },
+    { label: 'Arizona', value: 'AZ' },
+    { label: 'Arkansas', value: 'AR' },
+    { label: 'California', value: 'CA' },
+    { label: 'Colorado', value: 'CO' },
+    { label: 'Connecticut', value: 'CT' },
+    { label: 'Delaware', value: 'DE' },
+    { label: 'Florida', value: 'FL' },
+    { label: 'Georgia', value: 'GA' },
+    { label: 'Hawaii', value: 'HI' },
+    { label: 'Idaho', value: 'ID' },
+    { label: 'Illinois', value: 'IL' },
+    { label: 'Indiana', value: 'IN' },
+    { label: 'Iowa', value: 'IA' },
+    { label: 'Kansas', value: 'KS' },
+    { label: 'Kentucky', value: 'KY' },
+    { label: 'Louisiana', value: 'LA' },
+    { label: 'Maine', value: 'ME' },
+    { label: 'Maryland', value: 'MD' },
+    { label: 'Massachusetts', value: 'MA' },
+    { label: 'Michigan', value: 'MI' },
+    { label: 'Minnesota', value: 'MN' },
+    { label: 'Mississippi', value: 'MS' },
+    { label: 'Missouri', value: 'MO' },
+    { label: 'Montana', value: 'MT' },
+    { label: 'Nebraska', value: 'NE' },
+    { label: 'Nevada', value: 'NV' },
+    { label: 'New Hampshire', value: 'NH' },
+    { label: 'New Jersey', value: 'NJ' },
+    { label: 'New Mexico', value: 'NM' },
+    { label: 'New York', value: 'NY' },
+    { label: 'North Carolina', value: 'NC' },
+    { label: 'North Dakota', value: 'ND' },
+    { label: 'Ohio', value: 'OH' },
+    { label: 'Oklahoma', value: 'OK' },
+    { label: 'Oregon', value: 'OR' },
+    { label: 'Pennsylvania', value: 'PA' },
+    { label: 'Rhode Island', value: 'RI' },
+    { label: 'South Carolina', value: 'SC' },
+    { label: 'South Dakota', value: 'SD' },
+    { label: 'Tennessee', value: 'TN' },
+    { label: 'Texas', value: 'TX' },
+    { label: 'Utah', value: 'UT' },
+    { label: 'Vermont', value: 'VT' },
+    { label: 'Virginia', value: 'VA' },
+    { label: 'Washington', value: 'WA' },
+    { label: 'West Virginia', value: 'WV' },
+    { label: 'Wisconsin', value: 'WI' },
+    { label: 'Wyoming', value: 'WY' },
+  ];
+
+  const fetchCarInfo = async (type: string, value: string, stateValue?: string) => {
     setLoading(true);
     try {
-      let response
+      let response;
 
       if (type === 'vin') {
         response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${value}?format=json`);
       } else {
-        // TODO:: License plate API
-        response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${value}?format=json`);
+        const url = "https://platetovin.com/api/convert";
+        const headers = {
+          'Authorization': 'TmQT6D4jy6uhVHr',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        };
+        const body = {
+          plate: value,
+          state: stateValue,
+        };
+        response = await axios.post(url, body, { headers });
       }
-      
-      const { Make = '', Model = '', ModelYear = '', ErrorCode } = response.data.Results[0];
 
-      setFormData({
-        ...formData,
-        carModel: Model,
-        carMake: Make,
-        carYear: ModelYear,
-        [type]: value
-      });
+      if (type === 'vin') {
+        const { Make = '', Model = '', ModelYear = '', ErrorCode } = response.data.Results[0];
 
-      if (ErrorCode !== '0') {
-        console.log(ErrorCode);
-        setFormErrors(`Unable to fetch car information. Please check the ${selection === 'vin' ? 'VIN' : 'License Plate'}.`);
-        setSnackbarMessage(`Invalid ${selection === 'vin' ? 'VIN' : 'License Plate'} entered`);
-        setSnackbarOpen(true);
+        setFormData((prevData) => ({
+          ...prevData,
+          carModel: Model,
+          carMake: Make,
+          carYear: ModelYear,
+          [type]: value,
+        }));
+
+        if (ErrorCode !== '0') {
+          handleError(type);
+        } else {
+          setFormErrors('');
+          setStep(2);
+        }
       } else {
-        setFormErrors('')
-        setStep(2)
+        const { make = '', model = '', year = '', trim = '', vin } = response.data.vin;
+
+        setFormData((prevData) => ({
+          ...prevData,
+          carModel: model,
+          carMake: make,
+          carYear: year,
+          carTrim: trim,
+          vin: vin,
+          licensePlate: value,
+        }));
+
+        if (!vin) {
+          handleError(type);
+        } else {
+          setFormErrors('');
+          setStep(2);
+        }
       }
     } catch (error) {
-      console.log(error);
-      setFormErrors(`Unable to fetch car information. Please check the ${selection === 'vin' ? 'VIN' : 'License Plate'}.`);
-      setSnackbarMessage(`Invalid ${selection === 'vin' ? 'VIN' : 'License Plate'} entered`);
-      setSnackbarOpen(true);
+      console.error(error);
+      handleError(type);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleError = (type: string) => {
+    const identifier = type === 'vin' ? 'VIN' : 'License Plate';
+    setFormErrors(`Unable to fetch car information. Please check the ${identifier}.`);
+    setSnackbarMessage(`Invalid ${identifier} entered`);
+    setSnackbarOpen(true);
   };
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +177,7 @@ const CarForm: React.FC = () => {
 
     if (name === 'vin' && value.length === 17) {
       await fetchCarInfo('vin', value);
-      return
+      return;
     } else if (name === 'vin' && value.length !== 17) {
       setFormData({
         ...formData,
@@ -98,8 +185,18 @@ const CarForm: React.FC = () => {
         [name]: value,
       });
 
-      return
+      return;
     }
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSelectChange = (event: SelectChangeEvent<string>) => {
+    const name = event.target.name as string;
+    const value = event.target.value as string;
 
     setFormData({
       ...formData,
@@ -114,7 +211,9 @@ const CarForm: React.FC = () => {
       setFormData({
         ...formData,
         vin: '',
+        carModel: '',
         licensePlate: '',
+        state: '',
       });
     }
   };
@@ -125,8 +224,8 @@ const CarForm: React.FC = () => {
       return false;
     }
 
-    if (selection === 'licensePlate' && !formData.licensePlate) {
-      setFormErrors('License Plate is required');
+    if (selection === 'licensePlate' && (!formData.licensePlate || !formData.state)) {
+      setFormErrors('License Plate and State are required');
       return false;
     }
 
@@ -156,7 +255,7 @@ const CarForm: React.FC = () => {
     const identifier = selection === 'vin' ? formData.vin : formData.licensePlate;
     const type = selection === 'vin' ? 'vin' : 'licensePlate';
 
-    await fetchCarInfo(type, identifier);
+    await fetchCarInfo(type, identifier, formData.state);
   };
 
   const handleSecondStepSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -175,7 +274,7 @@ const CarForm: React.FC = () => {
     <Container maxWidth="sm">
       <Card>
         <CardContent>
-          {step === 1 &&
+          {step === 1 && (
             <>
               <StyledToggleButtonGroup
                 value={selection}
@@ -188,7 +287,7 @@ const CarForm: React.FC = () => {
                 </ToggleButton>
                 <ToggleButton value="licensePlate" aria-label="license plate">
                   License Plate
-                </ToggleButton>     
+                </ToggleButton>
               </StyledToggleButtonGroup>
               <form onSubmit={handleFirstStepSubmit}>
                 {selection === 'vin' && (
@@ -212,17 +311,37 @@ const CarForm: React.FC = () => {
                   />
                 )}
                 {selection === 'licensePlate' && (
-                  <TextField
-                    label="License Plate"
-                    name="licensePlate"
-                    value={formData.licensePlate}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                    required
-                    error={!!formErrors}
-                    helperText={formErrors}
-                  />
+                  <>
+                    <TextField
+                      label="License Plate"
+                      name="licensePlate"
+                      value={formData.licensePlate}
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      required
+                      error={!!formErrors}
+                      helperText={formErrors}
+                    />
+                    <FormControl fullWidth margin="normal" required error={!!formErrors}>
+                      <InputLabel id="state-label">State</InputLabel>
+                      <Select
+                        labelId="state-label"
+                        id="state"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleSelectChange}
+                        label="State"
+                      >
+                        {states.map((state) => (
+                          <MenuItem key={state.value} value={state.value}>
+                            {state.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {formErrors && <p style={{ color: 'red' }}>{formErrors}</p>}
+                    </FormControl>
+                  </>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   {loading ? (
@@ -232,16 +351,19 @@ const CarForm: React.FC = () => {
                       type="submit"
                       variant="contained"
                       color="primary"
-                      disabled={formData.carModel === ''}
+                      disabled={
+                        (selection === 'vin' && formData.carModel === '') ||
+                        (selection === 'licensePlate' && (formData.licensePlate === '' || formData.state === ''))
+                      }
                     >
                       Next
                     </Button>
                   )}
-                </div>     
+                </div>
               </form>
             </>
-          }
-          {step === 2 &&
+          )}
+          {step === 2 && (
             <form onSubmit={handleSecondStepSubmit}>
               <TextField
                 label="Name"
@@ -305,14 +427,20 @@ const CarForm: React.FC = () => {
                     type="submit"
                     variant="contained"
                     color="primary"
-                    disabled={formData.carModel === '' || formData.carYear === '' || formData.carMake === '' || formData.ownerName === '' || formData.email === ''}
+                    disabled={
+                      formData.carModel === '' ||
+                      formData.carYear === '' ||
+                      formData.carMake === '' ||
+                      formData.ownerName === '' ||
+                      formData.email === ''
+                    }
                   >
                     Submit
                   </Button>
                 </div>
               )}
             </form>
-          }
+          )}
         </CardContent>
       </Card>
       <Snackbar
