@@ -6,7 +6,6 @@ import Form from './Components/Form';
 import Footer from './Components/Footer';
 // import reportWebVitals from './reportWebVitals';
 import { motion } from 'framer-motion';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 const rootElement = document.getElementById('root');
 const containerVariants = {
