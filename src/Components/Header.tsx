@@ -38,7 +38,7 @@ const Header: React.FC = () => {
     <AppBar position="static">
       <Toolbar>
         <Box display="flex" justifyContent="space-between" width="100%">
-          {!isMobile && <Typography variant="h6">Vehicle Information Form</Typography>}
+          {!isMobile && <Typography variant="h6">Cash Offer Form</Typography>}
           <Box display="flex" alignItems="center">
             <IconButton onClick={(e) => handleIconClick(e, 'Address: 3340 Belt Line Rd, Dallas, TX')}>
               <LocationOnIcon />

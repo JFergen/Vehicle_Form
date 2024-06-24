@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Card, CardContent, TextField, Button, ToggleButton, ToggleButtonGroup, CircularProgress, Select,
-  MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Snackbar, Alert, Grid } from '@mui/material';
+  MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Snackbar, Alert, Grid, useMediaQuery } from '@mui/material';
 import DriveEtaIcon from '@mui/icons-material/DriveEta';
 import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import PhoneIcon from '@mui/icons-material/Phone';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import HowItWorks from './HowItWorks';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 
 // TODO
-// 3. When inputting make/model, have list of all potential makes and then based on that, have list of all potential models (Maybe enhancement?)
-// 4. Cool and hip UI
+// 1. When inputting make/model, have list of all potential makes and then based on that, have list of all potential models (Maybe enhancement?)
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
   marginBottom: theme.spacing(2),
@@ -25,10 +25,7 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
     },
     '&.Mui-selected': {
       backgroundColor: theme.palette.primary.main,
-      color: theme.palette.primary.contrastText,
-      '&:hover': {
-        backgroundColor: theme.palette.primary.main,
-      },
+      color: theme.palette.primary.contrastText
     },
     '&.MuiToggleButton-root': {
       border: `1px solid ${theme.palette.divider}`,
@@ -46,6 +43,7 @@ const Form: React.FC = () => {
     licensePlate: '',
     state: '',
     email: '',
+    phoneNumber: ''
   });
   const [selection, setSelection] = useState('vin');
   const [formErrors, setFormErrors] = useState('');
@@ -53,6 +51,8 @@ const Form: React.FC = () => {
   const [step, setStep] = useState(1)
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const states = [
     { label: 'Alabama', value: 'AL' },
@@ -252,6 +252,11 @@ const Form: React.FC = () => {
       return false;
     }
 
+    if (!formData.phoneNumber) {
+      setFormErrors('Phone Number is required');
+      return false;
+    }
+
     setFormErrors('');
     return true;
   };
@@ -269,12 +274,29 @@ const Form: React.FC = () => {
   const handleSecondStepSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateSecondStep()) return;
+    setLoading(true);
 
     try {
       await axios.post(`${process.env.REACT_APP_API_TO_CALL}/send-email`, formData);
-      alert('Form submitted successfully!');
+      setSnackbarMessage('Form submitted successfully!');
+      setSnackbarOpen(true);
+      setLoading(false);
+      setStep(1);
+      setFormData({
+        ownerName: '',
+        carModel: '',
+        carYear: '',
+        carMake: '',
+        vin: '',
+        licensePlate: '',
+        state: '',
+        email: '',
+        phoneNumber: ''
+      });
     } catch (error) {
-      alert('Error submitting form!');
+      setSnackbarMessage('Error submitting form!');
+      setSnackbarOpen(true);
+      setLoading(false);
     }
   };
 
@@ -284,7 +306,7 @@ const Form: React.FC = () => {
         <Grid item xs={12} sm={4} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <HowItWorks />
         </Grid>
-        <Grid item xs={12} sm={8} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Grid item xs={12} sm={8} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: isMobile ? 'auto' : 700 }}>
           <Card>
             <CardContent>
               {step === 1 && (
@@ -298,7 +320,7 @@ const Form: React.FC = () => {
                     <ToggleButton value="vin" aria-label="vin">
                       VIN
                     </ToggleButton>
-                    <ToggleButton value="licensePlate" aria-label="license plate">
+                    <ToggleButton value="licensePlate" aria-label="license plate" style={{ textTransform: 'none' }}>
                       License Plate
                     </ToggleButton>
                   </StyledToggleButtonGroup>
@@ -420,6 +442,23 @@ const Form: React.FC = () => {
                     }}
                   />
                   <TextField
+                    label="Phone Number"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    type="tel"
+                    fullWidth
+                    margin="normal"
+                    required
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PhoneIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <TextField
                     label="Car Model"
                     name="carModel"
                     value={formData.carModel}
@@ -468,18 +507,18 @@ const Form: React.FC = () => {
                       ),
                     }}
                   />
-                  {loading ? (
-                    <CircularProgress />
-                  ) : (
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => setStep(1)}
-                        startIcon={<ArrowBackIcon />}
-                      >
-                        Back
-                      </Button>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => setStep(1)}
+                      startIcon={<ArrowBackIcon />}
+                    >
+                      Back
+                    </Button>
+                    {loading ? (
+                      <CircularProgress />
+                    ) : (
                       <Button
                         type="submit"
                         variant="contained"
@@ -495,8 +534,8 @@ const Form: React.FC = () => {
                       >
                         Submit
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </form>
               )}
             </CardContent>
