@@ -51,6 +51,7 @@ const Form: React.FC = () => {
   const [step, setStep] = useState(1)
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackBarSeverity, setSnackBarSeverity] = useState<'success' | 'error' | 'info' | 'warning' | 'default'>('default');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -177,6 +178,7 @@ const Form: React.FC = () => {
     const identifier = type === 'vin' ? 'VIN' : 'License Plate';
     setFormErrors(`Unable to fetch car information. Please check the ${identifier}.`);
     setSnackbarMessage(`Invalid ${identifier} entered`);
+    setSnackBarSeverity('error');
     setSnackbarOpen(true);
   };
 
@@ -279,6 +281,7 @@ const Form: React.FC = () => {
     try {
       await axios.post(`${process.env.REACT_APP_API_TO_CALL}/send-email`, formData);
       setSnackbarMessage('Form submitted successfully!');
+      setSnackBarSeverity('success');
       setSnackbarOpen(true);
       setLoading(false);
       setStep(1);
@@ -295,6 +298,7 @@ const Form: React.FC = () => {
       });
     } catch (error) {
       setSnackbarMessage('Error submitting form!');
+      setSnackBarSeverity('error');
       setSnackbarOpen(true);
       setLoading(false);
     }
@@ -547,7 +551,7 @@ const Form: React.FC = () => {
         autoHideDuration={6000}
         onClose={() => setSnackbarOpen(false)}
       >
-        <Alert onClose={() => setSnackbarOpen(false)} severity="error" sx={{ width: '100%' }}>
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackBarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
