@@ -3,6 +3,7 @@ import { AppBar, Toolbar, Typography, Box, IconButton, Popover, useMediaQuery, u
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PhoneIcon from '@mui/icons-material/Phone';
+import { motion } from 'framer-motion';
 
 const Header: React.FC = () => {
   const theme = useTheme();
@@ -35,20 +36,46 @@ const Header: React.FC = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" style={{ background: 'linear-gradient(to right, #ff0000, #000000)' }}>
       <Toolbar>
-        <Box display="flex" justifyContent="space-between" width="100%">
-          {!isMobile && <Typography variant="h6">Cash Offer Form</Typography>}
+        <Box display="flex" justifyContent="space-between" width="100%" alignItems="center">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {!isMobile && (
+              <Typography variant="h6" style={{ display: 'flex', alignItems: 'center' }}>
+                {/* <img src="/path/to/logo.png" alt="Logo" style={{ height: 40, marginRight: 10 }} /> */}
+                Cash Offer Form
+              </Typography>
+            )}
+          </motion.div>
           <Box display="flex" alignItems="center">
-            <IconButton onClick={(e) => handleIconClick(e, 'Address: 3340 Belt Line Rd, Dallas, TX')}>
-              <LocationOnIcon />
-            </IconButton>
-            <IconButton onClick={(e) => handleIconClick(e, `Open Hours: ${getCurrentOpenHours()}`)}>
-              <AccessTimeIcon />
-            </IconButton>
-            <IconButton onClick={(e) => handleIconClick(e, 'Sales Phone: 972-231-3777')}>
-              <PhoneIcon />
-            </IconButton>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <IconButton onClick={(e) => handleIconClick(e, 'Address: 3340 Belt Line Rd, Dallas, TX')}>
+                <LocationOnIcon style={{ color: '#fff' }} />
+              </IconButton>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <IconButton onClick={(e) => handleIconClick(e, `Open Hours: ${getCurrentOpenHours()}`)}>
+                <AccessTimeIcon style={{ color: '#fff' }} />
+              </IconButton>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <IconButton onClick={(e) => handleIconClick(e, 'Sales Phone: 972-231-3777')}>
+                <PhoneIcon style={{ color: '#fff' }} />
+              </IconButton>
+            </motion.div>
           </Box>
         </Box>
         <Popover

@@ -42,7 +42,7 @@ if (rootElement) {
       <ThemeProvider theme={theme}>
         <motion.div variants={containerVariants} initial="hidden" animate="visible" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <Header />
-          <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', flex: 1 }}>
             <Form />
           </div>
           <Footer />

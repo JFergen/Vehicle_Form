@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Card, CardContent, TextField, Button, ToggleButton, ToggleButtonGroup, CircularProgress, Select,
-  MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Snackbar, Alert, Grid, useMediaQuery } from '@mui/material';
+  MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Snackbar, Alert, Grid, useMediaQuery,
+  IconButton, Popover, Typography, Box } from '@mui/material';
 import DriveEtaIcon from '@mui/icons-material/DriveEta';
 import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
@@ -10,7 +11,8 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import HowItWorks from './HowItWorks';
+import InfoIcon from '@mui/icons-material/Info';
+// import HowItWorks from './HowItWorks';
 import { styled, useTheme } from '@mui/material/styles';
 
 // TODO
@@ -54,6 +56,7 @@ const Form: React.FC = () => {
   const [snackBarSeverity, setSnackBarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('error');
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const states = [
     { label: 'Alabama', value: 'AL' },
@@ -304,30 +307,64 @@ const Form: React.FC = () => {
     }
   };
 
+  const handleInfoClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleInfoClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'how-it-works-popover' : undefined;
+
   return (
     <Container maxWidth="md" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <Grid container spacing={6} justifyContent="center">
-        <Grid item xs={12} sm={4} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <HowItWorks />
-        </Grid>
+      <Grid container justifyContent="center">
         <Grid item xs={12} sm={8} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: isMobile ? 'auto' : 700 }}>
           <Card>
             <CardContent>
               {step === 1 && (
                 <>
-                  <StyledToggleButtonGroup
-                    value={selection}
-                    exclusive
-                    onChange={handleSelectionChange}
-                    aria-label="car information selection"
-                  >
-                    <ToggleButton value="vin" aria-label="vin">
-                      VIN
-                    </ToggleButton>
-                    <ToggleButton value="licensePlate" aria-label="license plate" style={{ textTransform: 'none' }}>
-                      License Plate
-                    </ToggleButton>
-                  </StyledToggleButtonGroup>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <StyledToggleButtonGroup
+                      value={selection}
+                      exclusive
+                      onChange={handleSelectionChange}
+                      aria-label="car information selection"
+                      style={{ marginBottom: 0 }}
+                    >
+                      <ToggleButton value="vin" aria-label="vin">
+                        VIN
+                      </ToggleButton>
+                      <ToggleButton value="licensePlate" aria-label="license plate" style={{ textTransform: 'none' }}>
+                        License Plate
+                      </ToggleButton>
+                    </StyledToggleButtonGroup>
+                    <IconButton aria-describedby={id} onClick={handleInfoClick}>
+                      <InfoIcon />
+                    </IconButton>
+                    <Popover
+                      id={id}
+                      open={open}
+                      anchorEl={anchorEl}
+                      onClose={handleInfoClose}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                      horizontal: 'center',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                      }}
+                    >
+                      <Box p={2}>
+                        <Typography variant="body1">
+                          After submitting the form, a representative from Certified Autoplex will reach out about your cash offer.
+                        </Typography>
+                      </Box>
+                    </Popover>
+                  </div>
                   <form onSubmit={handleFirstStepSubmit}>
                     {selection === 'vin' && (
                       <TextField
