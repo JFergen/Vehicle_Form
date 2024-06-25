@@ -44,12 +44,22 @@ const Header: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {!isMobile && (
-              <Typography variant="h6" style={{ display: 'flex', alignItems: 'center' }}>
-                {/* <img src="/path/to/logo.png" alt="Logo" style={{ height: 40, marginRight: 10 }} /> */}
-                Cash Offer Form
-              </Typography>
-            )}
+            <Typography variant="h6" style={{ display: 'flex', alignItems: 'center' }}>
+              {!isMobile && "Owned and Operated by"} 
+              <a href="https://www.certifiedautoplex.com" target="_blank" rel="noopener noreferrer">
+                <img
+                  src="/CertifiedAutoplex.png"
+                  alt="Logo"
+                  style={{
+                    height: 40,
+                    marginLeft: isMobile ? 0 : 10,
+                    marginTop: isMobile ? 10 : 0,
+                    padding: 5,
+                    backgroundColor: 'white'
+                  }}
+                />
+              </a>
+            </Typography>
           </motion.div>
           <Box display="flex" alignItems="center">
             <motion.div
@@ -87,7 +97,7 @@ const Header: React.FC = () => {
         >
           {popoverContent.includes('Address') ? (
             <Typography sx={{ p: 2 }}>
-              Address: <a href="geo:3340 Belt Line Rd, Dallas, TX" target="_blank" rel="noopener noreferrer">
+              Address: <a href="https://www.google.com/maps/search/?api=1&query=Certified+Autoplex,+Dallas,+TX" target="_blank" rel="noopener noreferrer">
                 3340 Belt Line Rd, Dallas, TX
               </a>
             </Typography>

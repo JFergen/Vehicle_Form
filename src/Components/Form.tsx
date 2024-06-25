@@ -321,7 +321,7 @@ const Form: React.FC = () => {
   return (
     <Container maxWidth="md" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <Grid container justifyContent="center">
-        <Grid item xs={12} sm={8} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: isMobile ? 'auto' : 700 }}>
+        <Grid item xs={12} sm={8} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Card>
             <CardContent>
               {step === 1 && (
