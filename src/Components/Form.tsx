@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Card, CardContent, TextField, Button, ToggleButton, ToggleButtonGroup, CircularProgress, Select,
-  MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Snackbar, Alert, Grid, useMediaQuery,
-  IconButton, Popover, Typography, Box } from '@mui/material';
+  MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Snackbar, Alert, Grid, IconButton, Popover,
+  Typography, Box } from '@mui/material';
 import DriveEtaIcon from '@mui/icons-material/DriveEta';
 import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
@@ -13,7 +13,7 @@ import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InfoIcon from '@mui/icons-material/Info';
 // import HowItWorks from './HowItWorks';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 
 // TODO
 // 1. When inputting make/model, have list of all potential makes and then based on that, have list of all potential models (Maybe enhancement?)
@@ -54,7 +54,7 @@ const Form: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackBarSeverity, setSnackBarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('error');
-  const theme = useTheme();
+  // const theme = useTheme();
   // const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
