@@ -4,7 +4,7 @@ import './index.css';
 import Header from './Components/Header';
 import Form from './Components/Form';
 import Footer from './Components/Footer';
-import { Typography } from '@mui/material';
+// import { Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
