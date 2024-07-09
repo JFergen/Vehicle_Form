@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, Card, CardContent, TextField, Button, ToggleButton, ToggleButtonGroup, CircularProgress, Select,
-  MenuItem, InputLabel, FormControl, SelectChangeEvent, InputAdornment, Snackbar, Alert, Grid, IconButton, Popover,
-  Typography, Box } from '@mui/material';
+import { Container, Card, CardContent, TextField, Button, CircularProgress,
+  InputAdornment, Snackbar, Alert, Grid, IconButton, Popover, Typography, Box } from '@mui/material';
 import DriveEtaIcon from '@mui/icons-material/DriveEta';
 import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
@@ -12,31 +11,35 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import SendIcon from '@mui/icons-material/Send';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InfoIcon from '@mui/icons-material/Info';
+import { motion } from 'framer-motion';
 // import HowItWorks from './HowItWorks';
-import { styled } from '@mui/material/styles';
+// import { styled } from '@mui/material/styles';
 
 // TODO
 // 1. When inputting make/model, have list of all potential makes and then based on that, have list of all potential models (Maybe enhancement?)
+// 2. Add animations
+// 3. Add photos
+// 4. Add form questions
 
-const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-  '& .MuiToggleButtonGroup-grouped': {
-    borderRadius: theme.shape.borderRadius,
-    '&:not(:first-of-type)': {
-      borderLeft: 0,
-    },
-    '&.Mui-selected': {
-      backgroundColor: theme.palette.primary.main,
-      color: theme.palette.primary.contrastText,
-      '&:hover': {
-        backgroundColor: theme.palette.primary.main,
-      },
-    },
-    '&.MuiToggleButton-root': {
-      border: `1px solid ${theme.palette.divider}`,
-    },
-  },
-}));
+// const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+//   marginBottom: theme.spacing(2),
+//   '& .MuiToggleButtonGroup-grouped': {
+//     borderRadius: theme.shape.borderRadius,
+//     '&:not(:first-of-type)': {
+//       borderLeft: 0,
+//     },
+//     '&.Mui-selected': {
+//       backgroundColor: theme.palette.primary.main,
+//       color: theme.palette.primary.contrastText,
+//       '&:hover': {
+//         backgroundColor: theme.palette.primary.main,
+//       },
+//     },
+//     '&.MuiToggleButton-root': {
+//       border: `1px solid ${theme.palette.divider}`,
+//     },
+//   },
+// }));
 
 const Form: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -45,12 +48,13 @@ const Form: React.FC = () => {
     carYear: '',
     carMake: '',
     vin: '',
-    licensePlate: '',
-    state: '',
+    // licensePlate: '',
+    // state: '',
     email: '',
     phoneNumber: ''
   });
-  const [selection, setSelection] = useState('vin');
+  // const [selection, setSelection] = useState('vin');
+  const selection = 'vin';
   const [formErrors, setFormErrors] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1)
@@ -60,59 +64,64 @@ const Form: React.FC = () => {
   // const theme = useTheme();
   // const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const stepVariants = {
+    hidden: { opacity: 0, x: -100 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 100 },
+  };
 
-  const states = [
-    { label: 'Alabama', value: 'AL' },
-    { label: 'Alaska', value: 'AK' },
-    { label: 'Arizona', value: 'AZ' },
-    { label: 'Arkansas', value: 'AR' },
-    { label: 'California', value: 'CA' },
-    { label: 'Colorado', value: 'CO' },
-    { label: 'Connecticut', value: 'CT' },
-    { label: 'Delaware', value: 'DE' },
-    { label: 'Florida', value: 'FL' },
-    { label: 'Georgia', value: 'GA' },
-    { label: 'Hawaii', value: 'HI' },
-    { label: 'Idaho', value: 'ID' },
-    { label: 'Illinois', value: 'IL' },
-    { label: 'Indiana', value: 'IN' },
-    { label: 'Iowa', value: 'IA' },
-    { label: 'Kansas', value: 'KS' },
-    { label: 'Kentucky', value: 'KY' },
-    { label: 'Louisiana', value: 'LA' },
-    { label: 'Maine', value: 'ME' },
-    { label: 'Maryland', value: 'MD' },
-    { label: 'Massachusetts', value: 'MA' },
-    { label: 'Michigan', value: 'MI' },
-    { label: 'Minnesota', value: 'MN' },
-    { label: 'Mississippi', value: 'MS' },
-    { label: 'Missouri', value: 'MO' },
-    { label: 'Montana', value: 'MT' },
-    { label: 'Nebraska', value: 'NE' },
-    { label: 'Nevada', value: 'NV' },
-    { label: 'New Hampshire', value: 'NH' },
-    { label: 'New Jersey', value: 'NJ' },
-    { label: 'New Mexico', value: 'NM' },
-    { label: 'New York', value: 'NY' },
-    { label: 'North Carolina', value: 'NC' },
-    { label: 'North Dakota', value: 'ND' },
-    { label: 'Ohio', value: 'OH' },
-    { label: 'Oklahoma', value: 'OK' },
-    { label: 'Oregon', value: 'OR' },
-    { label: 'Pennsylvania', value: 'PA' },
-    { label: 'Rhode Island', value: 'RI' },
-    { label: 'South Carolina', value: 'SC' },
-    { label: 'South Dakota', value: 'SD' },
-    { label: 'Tennessee', value: 'TN' },
-    { label: 'Texas', value: 'TX' },
-    { label: 'Utah', value: 'UT' },
-    { label: 'Vermont', value: 'VT' },
-    { label: 'Virginia', value: 'VA' },
-    { label: 'Washington', value: 'WA' },
-    { label: 'West Virginia', value: 'WV' },
-    { label: 'Wisconsin', value: 'WI' },
-    { label: 'Wyoming', value: 'WY' },
-  ];
+  // const states = [
+  //   { label: 'Alabama', value: 'AL' },
+  //   { label: 'Alaska', value: 'AK' },
+  //   { label: 'Arizona', value: 'AZ' },
+  //   { label: 'Arkansas', value: 'AR' },
+  //   { label: 'California', value: 'CA' },
+  //   { label: 'Colorado', value: 'CO' },
+  //   { label: 'Connecticut', value: 'CT' },
+  //   { label: 'Delaware', value: 'DE' },
+  //   { label: 'Florida', value: 'FL' },
+  //   { label: 'Georgia', value: 'GA' },
+  //   { label: 'Hawaii', value: 'HI' },
+  //   { label: 'Idaho', value: 'ID' },
+  //   { label: 'Illinois', value: 'IL' },
+  //   { label: 'Indiana', value: 'IN' },
+  //   { label: 'Iowa', value: 'IA' },
+  //   { label: 'Kansas', value: 'KS' },
+  //   { label: 'Kentucky', value: 'KY' },
+  //   { label: 'Louisiana', value: 'LA' },
+  //   { label: 'Maine', value: 'ME' },
+  //   { label: 'Maryland', value: 'MD' },
+  //   { label: 'Massachusetts', value: 'MA' },
+  //   { label: 'Michigan', value: 'MI' },
+  //   { label: 'Minnesota', value: 'MN' },
+  //   { label: 'Mississippi', value: 'MS' },
+  //   { label: 'Missouri', value: 'MO' },
+  //   { label: 'Montana', value: 'MT' },
+  //   { label: 'Nebraska', value: 'NE' },
+  //   { label: 'Nevada', value: 'NV' },
+  //   { label: 'New Hampshire', value: 'NH' },
+  //   { label: 'New Jersey', value: 'NJ' },
+  //   { label: 'New Mexico', value: 'NM' },
+  //   { label: 'New York', value: 'NY' },
+  //   { label: 'North Carolina', value: 'NC' },
+  //   { label: 'North Dakota', value: 'ND' },
+  //   { label: 'Ohio', value: 'OH' },
+  //   { label: 'Oklahoma', value: 'OK' },
+  //   { label: 'Oregon', value: 'OR' },
+  //   { label: 'Pennsylvania', value: 'PA' },
+  //   { label: 'Rhode Island', value: 'RI' },
+  //   { label: 'South Carolina', value: 'SC' },
+  //   { label: 'South Dakota', value: 'SD' },
+  //   { label: 'Tennessee', value: 'TN' },
+  //   { label: 'Texas', value: 'TX' },
+  //   { label: 'Utah', value: 'UT' },
+  //   { label: 'Vermont', value: 'VT' },
+  //   { label: 'Virginia', value: 'VA' },
+  //   { label: 'Washington', value: 'WA' },
+  //   { label: 'West Virginia', value: 'WV' },
+  //   { label: 'Wisconsin', value: 'WI' },
+  //   { label: 'Wyoming', value: 'WY' },
+  // ];
 
   const fetchCarInfo = async (type: string, value: string, stateValue?: string) => {
     setLoading(true);
@@ -162,7 +171,7 @@ const Form: React.FC = () => {
           carYear: year,
           carTrim: trim,
           vin: vin,
-          licensePlate: value,
+          // licensePlate: value,
         }));
 
         if (!vin) {
@@ -181,7 +190,8 @@ const Form: React.FC = () => {
   };
 
   const handleError = (type: string) => {
-    const identifier = type === 'vin' ? 'VIN' : 'License Plate';
+    // const identifier = type === 'vin' ? 'VIN' : 'License Plate';
+    const identifier = 'VIN';
     setFormErrors(`Unable to fetch car information. Please check the ${identifier}.`);
     setSnackbarMessage(`Invalid ${identifier} entered`);
     setSnackBarSeverity('error');
@@ -210,29 +220,29 @@ const Form: React.FC = () => {
     });
   };
 
-  const handleSelectChange = (event: SelectChangeEvent<string>) => {
-    const name = event.target.name as string;
-    const value = event.target.value as string;
+  // const handleSelectChange = (event: SelectChangeEvent<string>) => {
+  //   const name = event.target.name as string;
+  //   const value = event.target.value as string;
 
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  //   setFormData({
+  //     ...formData,
+  //     [name]: value,
+  //   });
+  // };
 
-  const handleSelectionChange = (event: React.MouseEvent<HTMLElement>, newSelection: string) => {
-    if (newSelection !== null) {
-      setSelection(newSelection);
-      setFormErrors('');
-      setFormData({
-        ...formData,
-        vin: '',
-        carModel: '',
-        licensePlate: '',
-        state: '',
-      });
-    }
-  };
+  // const handleSelectionChange = (event: React.MouseEvent<HTMLElement>, newSelection: string) => {
+  //   if (newSelection !== null) {
+  //     setSelection(newSelection);
+  //     setFormErrors('');
+  //     setFormData({
+  //       ...formData,
+  //       vin: '',
+  //       carModel: '',
+  //       // licensePlate: '',
+  //       // state: '',
+  //     });
+  //   }
+  // };
 
   const validateFirstStep = () => {
     if (selection === 'vin' && !formData.vin) {
@@ -240,10 +250,10 @@ const Form: React.FC = () => {
       return false;
     }
 
-    if (selection === 'licensePlate' && (!formData.licensePlate || !formData.state)) {
-      setFormErrors('License Plate and State are required');
-      return false;
-    }
+    // if (selection === 'licensePlate' && (!formData.licensePlate || !formData.state)) {
+    //   setFormErrors('License Plate and State are required');
+    //   return false;
+    // }
 
     setFormErrors('');
     return true;
@@ -273,10 +283,12 @@ const Form: React.FC = () => {
     e.preventDefault();
     if (!validateFirstStep()) return;
 
-    const identifier = selection === 'vin' ? formData.vin : formData.licensePlate;
-    const type = selection === 'vin' ? 'vin' : 'licensePlate';
+    // const identifier = selection === 'vin' ? formData.vin : formData.licensePlate;
+    // const type = selection === 'vin' ? 'vin' : 'licensePlate';
+    const identifier = formData.vin;
+    const type = 'vin';
 
-    await fetchCarInfo(type, identifier, formData.state);
+    await fetchCarInfo(type, identifier);
   };
 
   const handleSecondStepSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -297,8 +309,8 @@ const Form: React.FC = () => {
         carYear: '',
         carMake: '',
         vin: '',
-        licensePlate: '',
-        state: '',
+        // licensePlate: '',
+        // state: '',
         email: '',
         phoneNumber: ''
       });
@@ -328,9 +340,16 @@ const Form: React.FC = () => {
           <Card>
             <CardContent>
               {step === 1 && (
-                <>
+                <motion.div
+                  key="step1"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={stepVariants}
+                  transition={{ duration: 0.5 }}
+                >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <StyledToggleButtonGroup
+                    {/* <StyledToggleButtonGroup
                       value={selection}
                       exclusive
                       onChange={handleSelectionChange}
@@ -343,7 +362,7 @@ const Form: React.FC = () => {
                       <ToggleButton value="licensePlate" aria-label="license plate" style={{ textTransform: 'none' }}>
                         License Plate
                       </ToggleButton>
-                    </StyledToggleButtonGroup>
+                    </StyledToggleButtonGroup> */}
                     <IconButton aria-describedby={id} onClick={handleInfoClick}>
                       <InfoIcon />
                     </IconButton>
@@ -396,7 +415,7 @@ const Form: React.FC = () => {
                         }}
                       />
                     )}
-                    {selection === 'licensePlate' && (
+                    {/* {selection === 'licensePlate' && (
                       <>
                         <TextField
                           label="License Plate"
@@ -428,7 +447,7 @@ const Form: React.FC = () => {
                           {formErrors && <p style={{ color: 'red' }}>{formErrors}</p>}
                         </FormControl>
                       </>
-                    )}
+                    )} */}
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                       {loading ? (
                         <CircularProgress />
@@ -439,8 +458,8 @@ const Form: React.FC = () => {
                           color="primary"
                           endIcon={<SendIcon />}
                           disabled={
-                            (selection === 'vin' && formData.carModel === '') ||
-                            (selection === 'licensePlate' && (formData.licensePlate === '' || formData.state === ''))
+                            (selection === 'vin' && formData.carModel === '')
+                            // ||(selection === 'licensePlate' && (formData.licensePlate === '' || formData.state === ''))
                           }
                         >
                           Next
@@ -448,139 +467,148 @@ const Form: React.FC = () => {
                       )}
                     </div>
                   </form>
-                </>
+                </motion.div>
               )}
               {step === 2 && (
-                <form onSubmit={handleSecondStepSubmit}>
-                  <TextField
-                    label="Name"
-                    name="ownerName"
-                    value={formData.ownerName}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                    required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <PersonIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <TextField
-                    label="Email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    type="email"
-                    fullWidth
-                    margin="normal"
-                    required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <EmailIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <TextField
-                    label="Phone Number"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    type="tel"
-                    fullWidth
-                    margin="normal"
-                    required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <PhoneIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <TextField
-                    label="Car Model"
-                    name="carModel"
-                    value={formData.carModel}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                    required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <DirectionsCarIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <TextField
-                    label="Car Year"
-                    name="carYear"
-                    value={formData.carYear}
-                    onChange={handleChange}
-                    type="number"
-                    fullWidth
-                    margin="normal"
-                    required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <CalendarTodayIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <TextField
-                    label="Car Make"
-                    name="carMake"
-                    value={formData.carMake}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="normal"
-                    required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <DirectionsCarIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => setStep(1)}
-                      startIcon={<ArrowBackIcon />}
-                    >
-                      Back
-                    </Button>
-                    {loading ? (
-                      <CircularProgress />
-                    ) : (
+                <motion.div
+                  key="step2"
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  variants={stepVariants}
+                  transition={{ duration: 0.5 }}
+                >
+                  <form onSubmit={handleSecondStepSubmit}>
+                    <TextField
+                      label="Name"
+                      name="ownerName"
+                      value={formData.ownerName}
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PersonIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    <TextField
+                      label="Email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      type="email"
+                      fullWidth
+                      margin="normal"
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <EmailIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    <TextField
+                      label="Phone Number"
+                      name="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={handleChange}
+                      type="tel"
+                      fullWidth
+                      margin="normal"
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PhoneIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    <TextField
+                      label="Car Model"
+                      name="carModel"
+                      value={formData.carModel}
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <DirectionsCarIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    <TextField
+                      label="Car Year"
+                      name="carYear"
+                      value={formData.carYear}
+                      onChange={handleChange}
+                      type="number"
+                      fullWidth
+                      margin="normal"
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <CalendarTodayIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    <TextField
+                      label="Car Make"
+                      name="carMake"
+                      value={formData.carMake}
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <DirectionsCarIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Button
-                        type="submit"
                         variant="contained"
                         color="primary"
-                        endIcon={<SendIcon />}
-                        disabled={
-                          formData.carModel === '' ||
-                          formData.carYear === '' ||
-                          formData.carMake === '' ||
-                          formData.ownerName === '' ||
-                          formData.email === ''
-                        }
+                        onClick={() => setStep(1)}
+                        startIcon={<ArrowBackIcon />}
                       >
-                        Submit
+                        Back
                       </Button>
-                    )}
-                  </div>
-                </form>
+                      {loading ? (
+                        <CircularProgress />
+                      ) : (
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          color="primary"
+                          endIcon={<SendIcon />}
+                          disabled={
+                            formData.carModel === '' ||
+                            formData.carYear === '' ||
+                            formData.carMake === '' ||
+                            formData.ownerName === '' ||
+                            formData.email === ''
+                          }
+                        >
+                          Submit
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                </motion.div>
               )}
             </CardContent>
           </Card>
