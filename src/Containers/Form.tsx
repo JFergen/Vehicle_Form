@@ -221,24 +221,39 @@ const Form: React.FC = () => {
       setSnackBarSeverity('success');
       setSnackbarOpen(true);
       setLoading(false);
-      // setStep(1);
-      // setFormData({
-      //   ownerName: '',
-      //   carModel: '',
-      //   carYear: '',
-      //   carMake: '',
-      //   vin: '',
-      //   email: '',
-      //   phoneNumber: '',
-      //   odometerPhoto: null,
-      //   driverFrontCornerPhoto: null,
-      //   passengerRearCornerPhoto: null,
-      //   smokedIn: '',
-      //   mechanicalIssues: '',
-      //   odometerBroken: '',
-      //   panelsNeedWork: '',
-      //   rustOrHailDamage: ''
-      // });
+      setStep(1);
+      setFormData({
+        ownerName: '',
+        carModel: '',
+        carYear: '',
+        carMake: '',
+        vin: '',
+        email: '',
+        phoneNumber: '',
+        odometerPhoto: null,
+        driverFrontCornerPhoto: null,
+        passengerRearCornerPhoto: null,
+        smokedIn: {
+          question: '',
+          answer: ''
+        },
+        mechanicalIssues: {
+          question: '',
+          answer: ''
+        },
+        odometerBroken: {
+          question: '',
+          answer: ''
+        },
+        panelsNeedWork: {
+          question: '',
+          answer: ''
+        },
+        rustOrHailDamage: {
+          question: '',
+          answer: ''
+        }
+      });
     } catch (error) {
       setSnackbarMessage('Error submitting form!');
       setSnackBarSeverity('error');
