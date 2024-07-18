@@ -48,7 +48,7 @@ const Header: React.FC = () => {
               {!isMobile && "Owned and Operated by"} 
               <a href="https://www.certifiedautoplex.com" target="_blank" rel="noopener noreferrer">
                 <img
-                  src="/CertifiedAutoplex.png"
+                  src={require('../images/CertifiedAutoplex.png')}
                   alt="Logo"
                   style={{
                     height: 40,
