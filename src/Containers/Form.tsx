@@ -24,11 +24,26 @@ const Form: React.FC = () => {
     odometerPhoto: null,
     driverFrontCornerPhoto: null,
     passengerRearCornerPhoto: null,
-    smokedIn: '',
-    mechanicalIssues: '',
-    odometerBroken: '',
-    panelsNeedWork: '',
-    rustOrHailDamage: ''
+    smokedIn: {
+      question: 'Has this vehicle been smoked in before?',
+      answer: ''
+    },
+    mechanicalIssues: {
+      question: 'Are there any mechanical issues or warning lights displayed on the dashboard?',
+      answer: ''
+    },
+    odometerBroken: {
+      question: 'Has the odometer ever been broken or replaced?',
+      answer: ''
+    },
+    panelsNeedWork: {
+      question: 'Are there any panels in need of paint or body work?',
+      answer: ''
+    },
+    rustOrHailDamage: {
+      question: 'Any major rust and/or hail damage?',
+      answer: ''
+    }
   });
   const [formErrors, setFormErrors] = useState('');
   const [loading, setLoading] = useState(false);
@@ -107,10 +122,25 @@ const Form: React.FC = () => {
       return;
     }
 
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    // Check if the name corresponds to a nested question/answer field
+    const nestedFields = ['smokedIn', 'mechanicalIssues', 'odometerBroken', 'panelsNeedWork', 'rustOrHailDamage'];
+    if (nestedFields.includes(name as typeof nestedFields[number])) {
+      const field = formData[name as keyof typeof formData];
+      if (typeof field === 'object' && field !== null) {
+        setFormData({
+          ...formData,
+          [name]: {
+            ...field,
+            answer: value,
+          },
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+  }
   };
 
   const validateFirstStep = () => {
@@ -166,11 +196,18 @@ const Form: React.FC = () => {
     setLoading(true);
   
     const formDataToSend = new FormData();
-    
+
     Object.keys(formData).forEach((key) => {
       const value = formData[key as keyof typeof formData];
       if (value !== null) {
-        formDataToSend.append(key, value);
+        if (typeof value === 'object' && value.question && value.answer) {
+          formDataToSend.append(`${key}_question`, value.question);
+          formDataToSend.append(`${key}_answer`, value.answer);
+        } else if (value instanceof File) {
+          formDataToSend.append(key, value);
+        } else {
+          formDataToSend.append(key, value.toString());
+        }
       }
     });
   
@@ -184,24 +221,24 @@ const Form: React.FC = () => {
       setSnackBarSeverity('success');
       setSnackbarOpen(true);
       setLoading(false);
-      setStep(1);
-      setFormData({
-        ownerName: '',
-        carModel: '',
-        carYear: '',
-        carMake: '',
-        vin: '',
-        email: '',
-        phoneNumber: '',
-        odometerPhoto: null,
-        driverFrontCornerPhoto: null,
-        passengerRearCornerPhoto: null,
-        smokedIn: '',
-        mechanicalIssues: '',
-        odometerBroken: '',
-        panelsNeedWork: '',
-        rustOrHailDamage: ''
-      });
+      // setStep(1);
+      // setFormData({
+      //   ownerName: '',
+      //   carModel: '',
+      //   carYear: '',
+      //   carMake: '',
+      //   vin: '',
+      //   email: '',
+      //   phoneNumber: '',
+      //   odometerPhoto: null,
+      //   driverFrontCornerPhoto: null,
+      //   passengerRearCornerPhoto: null,
+      //   smokedIn: '',
+      //   mechanicalIssues: '',
+      //   odometerBroken: '',
+      //   panelsNeedWork: '',
+      //   rustOrHailDamage: ''
+      // });
     } catch (error) {
       setSnackbarMessage('Error submitting form!');
       setSnackBarSeverity('error');

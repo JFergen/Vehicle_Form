@@ -12,9 +12,9 @@ const Step4: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         <Grid item xs={12}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ '&.Mui-focused': { color: 'black' }, color: 'black' }}>
-                Has this vehicle been smoked in before?
+                {formData.smokedIn.question}
             </FormLabel>
-            <RadioGroup name="smokedIn" value={formData.smokedIn} onChange={handleChange}>
+            <RadioGroup name="smokedIn" value={formData.smokedIn.answer} onChange={handleChange}>
               <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
               <FormControlLabel value="No" control={<Radio />} label="No" />
             </RadioGroup>
@@ -23,9 +23,9 @@ const Step4: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         <Grid item xs={12}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ '&.Mui-focused': { color: 'black' }, color: 'black' }}>
-                Are there any mechanical issues or warning lights displayed on the dashboard?
+                {formData.mechanicalIssues.question}
             </FormLabel>
-            <RadioGroup name="mechanicalIssues" value={formData.mechanicalIssues} onChange={handleChange}>
+            <RadioGroup name="mechanicalIssues" value={formData.mechanicalIssues.answer} onChange={handleChange}>
               <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
               <FormControlLabel value="No" control={<Radio />} label="No" />
             </RadioGroup>
@@ -34,9 +34,9 @@ const Step4: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         <Grid item xs={12}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ '&.Mui-focused': { color: 'black' }, color: 'black' }}>
-                Has the odometer ever been broken or replaced?
+                {formData.odometerBroken.question}
             </FormLabel>
-            <RadioGroup name="odometerBroken" value={formData.odometerBroken} onChange={handleChange}>
+            <RadioGroup name="odometerBroken" value={formData.odometerBroken.answer} onChange={handleChange}>
               <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
               <FormControlLabel value="No" control={<Radio />} label="No" />
             </RadioGroup>
@@ -45,9 +45,9 @@ const Step4: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         <Grid item xs={12}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ '&.Mui-focused': { color: 'black' }, color: 'black' }}>
-                Are there any panels in need of paint or body work?
+                {formData.panelsNeedWork.question}
             </FormLabel>
-            <RadioGroup name="panelsNeedWork" value={formData.panelsNeedWork} onChange={handleChange}>
+            <RadioGroup name="panelsNeedWork" value={formData.panelsNeedWork.answer} onChange={handleChange}>
               <FormControlLabel value="No" control={<Radio />} label="No" />
               <FormControlLabel value="Yes, 1" control={<Radio />} label="Yes, 1" />
               <FormControlLabel value="Yes, 2" control={<Radio />} label="Yes, 2" />
@@ -58,9 +58,9 @@ const Step4: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         <Grid item xs={12}>
           <FormControl component="fieldset">
             <FormLabel component="legend" sx={{ '&.Mui-focused': { color: 'black' }, color: 'black' }}>
-                Any major rust and/or hail damage?
+                {formData.rustOrHailDamage.question}
             </FormLabel>
-            <RadioGroup name="rustOrHailDamage" value={formData.rustOrHailDamage} onChange={handleChange}>
+            <RadioGroup name="rustOrHailDamage" value={formData.rustOrHailDamage.answer} onChange={handleChange}>
               <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
               <FormControlLabel value="No" control={<Radio />} label="No" />
             </RadioGroup>
