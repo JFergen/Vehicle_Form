@@ -1,15 +1,28 @@
 import React from 'react';
-import { Button, CircularProgress, Typography, Box, Divider, IconButton } from '@mui/material';
+import { Button, CircularProgress, Typography, Box, Divider, IconButton, useMediaQuery } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import UploadFile from '@mui/icons-material/UploadFile';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useTheme } from '@mui/material/styles';
 
 // TODO
 // 1. Use machine learning to check if it is a valid photo
 // 2. Be able to review previous form entries
 
 const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loading: boolean, goBack: any }> = ({ formData, handleChange, handleSubmit, loading, goBack }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const handleCameraClick = (inputId: string) => {
+    const inputElement = document.getElementById(inputId) as HTMLInputElement;
+    if (inputElement) {
+      inputElement.click();
+    }
+  };
+
   return (
     <Box
       component="form"
@@ -17,7 +30,6 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
       display="flex"
       flexDirection="column"
       alignItems="center"
-      sx={{ minWidth: 500 }}
     > 
       <Typography variant="h4" gutterBottom>
         Upload Photos
@@ -33,6 +45,7 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         type="file"
         name="odometerPhoto"
         onChange={handleChange}
+        capture="environment"
       />
       {formData.odometerPhoto ? (
         <>
@@ -46,7 +59,7 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
             <CheckCircleIcon color='success' sx={{ marginLeft: 5 }} />
             <label htmlFor="odometer-photo">
               <IconButton component='span'>
-                <EditIcon />
+                <EditIcon color='primary'/>
               </IconButton>
             </label>
           </Box>
@@ -63,14 +76,25 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
             Turn on your car before taking this photo to show any warnings.
           </Typography>
           <label htmlFor="odometer-photo">
-            <Button
-              variant="contained"
-              color="primary"
-              component='span'
-              sx={{ textTransform: 'none' }}
-            >
-              Upload Odometer Photo
-            </Button>
+            {isMobile ? (
+              <Box display="flex" justifyContent="center" alignItems="center">
+                <IconButton component="span">
+                  <UploadFile color='primary' />
+                </IconButton>
+                <IconButton component="span" onClick={() => handleCameraClick('odometer-photo')}>
+                  <PhotoCamera color='primary' />
+                </IconButton>
+              </Box>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                component='span'
+                sx={{ textTransform: 'none' }}
+              >
+                Upload Odometer Photo
+              </Button>
+            )}
           </label>
         </>
       )}
@@ -85,6 +109,7 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         type="file"
         name="driverFrontCornerPhoto"
         onChange={handleChange}
+        capture="environment"
       />
       {formData.driverFrontCornerPhoto ? (
         <>
@@ -98,7 +123,7 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
             <CheckCircleIcon color='success' sx={{ marginLeft: 5 }} />
             <label htmlFor="driver-front-corner-photo">
               <IconButton component='span'>
-                <EditIcon />
+                <EditIcon color='primary' />
               </IconButton>
             </label>
           </Box>  
@@ -115,14 +140,25 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
             Be sure to include the front and side in your photo.
           </Typography>
           <label htmlFor="driver-front-corner-photo">
-            <Button
-              variant="contained"
-              color="primary"
-              component="span"
-              sx={{ textTransform: 'none' }}
-            >
-              Upload Driver Front Corner Photo
-          </Button>
+            {isMobile ? (
+              <Box display="flex" justifyContent="center" alignItems="center">
+                <IconButton component="span">
+                  <UploadFile color='primary' />
+                </IconButton>
+                <IconButton component="span" onClick={() => handleCameraClick('driver-front-corner-photo')}>
+                  <PhotoCamera color='primary' />
+                </IconButton>
+              </Box>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                component="span"
+                sx={{ textTransform: 'none' }}
+              >
+                Upload Driver Front Corner Photo
+              </Button>
+            )}
           </label>
         </>
       )}
@@ -137,6 +173,7 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         type="file"
         name="passengerRearCornerPhoto"
         onChange={handleChange}
+        capture="environment"
       />
       {formData.passengerRearCornerPhoto ? (
         <>
@@ -150,7 +187,7 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
             <CheckCircleIcon color='success' sx={{ marginLeft: 5 }} />
             <label htmlFor="passenger-rear-corner-photo">
               <IconButton component='span'>
-                <EditIcon />
+                <EditIcon color='primary' />
               </IconButton>
             </label>
           </Box>
@@ -167,14 +204,25 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
             Be sure to include the back and side in your photo.
           </Typography>
           <label htmlFor="passenger-rear-corner-photo">
-            <Button
-              variant="contained"
-              color="primary"
-              component="span"
-              sx={{ textTransform: 'none' }}
-            >
-              Upload Passenger Rear Corner Photo
-            </Button>
+            {isMobile ? (
+              <Box display="flex" justifyContent="center" alignItems="center">
+                <IconButton component="span">
+                  <UploadFile color='primary' />
+                </IconButton>
+                <IconButton component="span" onClick={() => handleCameraClick('passenger-rear-corner-photo')}>
+                  <PhotoCamera color='primary' />
+                </IconButton>
+              </Box>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                component="span"
+                sx={{ textTransform: 'none' }}
+              >
+                Upload Passenger Rear Corner Photo
+              </Button>
+            )}
           </label>
         </>
       )}
