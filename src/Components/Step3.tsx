@@ -11,6 +11,7 @@ import { useTheme } from '@mui/material/styles';
 // TODO
 // 1. Use machine learning to check if it is a valid photo
 // 2. Be able to review previous form entries
+// 3. Change to use re-usable component for each photo and buttons
 
 const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loading: boolean, goBack: any }> = ({ formData, handleChange, handleSubmit, loading, goBack }) => {
   const theme = useTheme();
@@ -80,7 +81,16 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
                 <IconButton component="span">
                   <UploadFile color='primary' />
                 </IconButton>
-                <IconButton component="span" onClick={() => handleCameraClick('odometer-photo')}>
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="odometer-photo-camera"
+                  type="file"
+                  name="odometerPhoto"
+                  onChange={handleChange}
+                  capture="environment"
+                />
+                <IconButton component="span" onClick={() => handleCameraClick('odometer-photo-camera')}>
                   <PhotoCamera color='primary' />
                 </IconButton>
               </Box>
@@ -143,7 +153,16 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
                 <IconButton component="span">
                   <UploadFile color='primary' />
                 </IconButton>
-                <IconButton component="span" onClick={() => handleCameraClick('driver-front-corner-photo')}>
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="driver-front-corner-photo-camera"
+                  type="file"
+                  name="driverFrontCornerPhoto"
+                  onChange={handleChange}
+                  capture='environment'
+                />
+                <IconButton component="span" onClick={() => handleCameraClick('driver-front-corner-photo-camera')}>
                   <PhotoCamera color='primary' />
                 </IconButton>
               </Box>
@@ -206,7 +225,16 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
                 <IconButton component="span">
                   <UploadFile color='primary' />
                 </IconButton>
-                <IconButton component="span" onClick={() => handleCameraClick('passenger-rear-corner-photo')}>
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="driver-rear-corner-photo-camera"
+                  type="file"
+                  name="driverFrontCornerPhoto"
+                  onChange={handleChange}
+                  capture='environment'
+                />
+                <IconButton component="span" onClick={() => handleCameraClick('passenger-rear-corner-photo-camera')}>
                   <PhotoCamera color='primary' />
                 </IconButton>
               </Box>
