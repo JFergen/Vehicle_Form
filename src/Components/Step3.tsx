@@ -3,9 +3,9 @@ import { Button, CircularProgress, Typography, Box, Divider, IconButton, useMedi
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import UploadFile from '@mui/icons-material/UploadFile';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useTheme } from '@mui/material/styles';
 
 // TODO
@@ -45,7 +45,6 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         type="file"
         name="odometerPhoto"
         onChange={handleChange}
-        capture="environment"
       />
       {formData.odometerPhoto ? (
         <>
@@ -109,7 +108,6 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         type="file"
         name="driverFrontCornerPhoto"
         onChange={handleChange}
-        capture="environment"
       />
       {formData.driverFrontCornerPhoto ? (
         <>
@@ -173,7 +171,6 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         type="file"
         name="passengerRearCornerPhoto"
         onChange={handleChange}
-        capture="environment"
       />
       {formData.passengerRearCornerPhoto ? (
         <>
@@ -197,7 +194,7 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
           <img
             src={require('../images/passenger-rear-corner.png')}
             alt="passenger rear corner"
-            height="150px"
+            height="200px"
             width="300px"
           />
           <Typography variant="subtitle2" gutterBottom>
