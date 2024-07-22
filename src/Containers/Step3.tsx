@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button, CircularProgress, Typography, Box, Divider, IconButton, useMediaQuery } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SendIcon from '@mui/icons-material/Send';
+import { Button, Typography, Box, Divider, IconButton, useMediaQuery } from '@mui/material';
+import { BackButton, NextButton } from '../Components/Buttons';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
@@ -12,8 +11,6 @@ import { useTheme } from '@mui/material/styles';
 // 1. Use machine learning to check if it is a valid photo
 // 2. Be able to review previous form entries
 // 3. Change to use re-usable component for each photo and buttons
-
-// PRIORITY: SET INPUT FOR EACH BUTTON INDIVIDUALLY. BECAUSE INPUT IS SET AS PARENT FOR BUTTONS, IT IS STILL OPENING UP THE GALLERY AFTER CAMERA PIC
 
 const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loading: boolean, goBack: any }> = ({ formData, handleChange, handleSubmit, loading, goBack }) => {
   const theme = useTheme();
@@ -260,27 +257,8 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         </>
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px', width: '100%' }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={goBack}
-          startIcon={<ArrowBackIcon />}
-        >
-          Back
-        </Button>
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            disabled={!formData.odometerPhoto || !formData.driverFrontCornerPhoto || !formData.passengerRearCornerPhoto}
-            endIcon={<SendIcon />}
-          >
-            Next
-          </Button>
-        )}
+        <BackButton onClick={goBack} />
+        <NextButton loading={loading} disabled={!formData.odometerPhoto || !formData.driverFrontCornerPhoto || !formData.passengerRearCornerPhoto} />
       </div>
     </Box>
   );

@@ -1,12 +1,11 @@
 import React from 'react';
-import { TextField, Button, CircularProgress, InputAdornment } from '@mui/material';
+import { TextField, InputAdornment } from '@mui/material';
+import { BackButton, NextButton } from '../Components/Buttons';
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SendIcon from '@mui/icons-material/Send';
 
 const Step2: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loading: boolean, goBack: any }> = ({ formData, handleChange, handleSubmit, loading, goBack }) => {
   return (
@@ -111,33 +110,8 @@ const Step2: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
         }}
       />
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={goBack}
-          startIcon={<ArrowBackIcon />}
-        >
-          Back
-        </Button>
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            endIcon={<SendIcon />}
-            disabled={
-              formData.carModel === '' ||
-              formData.carYear === '' ||
-              formData.carMake === '' ||
-              formData.ownerName === '' ||
-              formData.email === ''
-            }
-          >
-            Next
-          </Button>
-        )}
+        <BackButton onClick={goBack} />
+        <NextButton loading={loading} disabled={ formData.carModel === '' || formData.carYear === '' || formData.carMake === '' || formData.ownerName === '' || formData.email === '' } />
       </div>
     </form>
   );
