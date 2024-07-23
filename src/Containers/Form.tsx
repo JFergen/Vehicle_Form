@@ -22,6 +22,9 @@ const Form: React.FC = () => {
     email: '',
     phoneNumber: '',
     odometerPhoto: null,
+    dashboardPhoto: null,
+    frontSeatsPhoto: null,
+    interiorRoofPhoto: null,
     driverFrontCornerPhoto: null,
     passengerRearCornerPhoto: null,
     smokedIn: {
@@ -231,6 +234,9 @@ const Form: React.FC = () => {
         email: '',
         phoneNumber: '',
         odometerPhoto: null,
+        dashboardPhoto: null,
+        frontSeatsPhoto: null,
+        interiorRoofPhoto: null,
         driverFrontCornerPhoto: null,
         passengerRearCornerPhoto: null,
         smokedIn: {
