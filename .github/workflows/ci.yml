@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - dev
-      - main
 
 jobs:
   build:
@@ -29,10 +28,10 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to QA
-        if: github.ref == 'refs/heads/dev'
-        run: npm run deploy:qa
-
-      - name: Deploy to Production
-        if: github.ref == 'refs/heads/main'
-        run: npm run deploy:prod
+      - name: Deploy to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          npm install -g netlify-cli
+          netlify deploy --prod --dir=build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
