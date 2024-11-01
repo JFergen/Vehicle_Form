@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Card, CardContent, Snackbar, Alert, Grid } from '@mui/material';
+import Carousel from '../Components/Carousel';
 import Step1 from './Step1';
 import Step2 from './Step2';
 import Step3 from './Step3';
@@ -54,6 +55,7 @@ const Form: React.FC = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackBarSeverity, setSnackBarSeverity] = useState<'success' | 'error' | 'info' | 'warning'>('error');
+  const [showForm, setShowForm] = useState(false);
   const stepVariants = {
     hidden: { opacity: 0, x: -100 },
     visible: { opacity: 1, x: 0 },
@@ -61,6 +63,7 @@ const Form: React.FC = () => {
   };
 
   const fetchCarInfo = async (value: string) => {
+    setShowForm(true);
     setLoading(true);
     try {
       let response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${value}?format=json`);
@@ -176,7 +179,15 @@ const Form: React.FC = () => {
     return true;
   };
 
-  const handleFirstStepSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleGoBack = (stepToGoBack: number) => {
+    if (stepToGoBack === 1) {
+      setShowForm(false);
+    }
+
+    setStep(stepToGoBack);
+  }
+
+  const handleFirstStepSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateFirstStep()) return;
 
@@ -271,8 +282,18 @@ const Form: React.FC = () => {
   return (
     <Container maxWidth="md" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <Grid container justifyContent="center">
-        <Grid item xs={12} sm={8} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Card>
+        <Grid item xs={12} sm={8} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {!showForm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{ width: '100%', marginBottom: '2rem' }}
+            >
+              <Carousel />
+            </motion.div>
+          )}
+          <Card style={{ width: '100%', backgroundColor: '#fff' }}>
             <CardContent style={{ paddingBottom: 16 }}>
               {step === 1 && (
                 <motion.div
@@ -307,7 +328,7 @@ const Form: React.FC = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSecondStepSubmit}
                     loading={loading}
-                    goBack={() => setStep(1)}
+                    goBack={() => handleGoBack(1)}
                   />
                 </motion.div>
               )}
@@ -325,7 +346,7 @@ const Form: React.FC = () => {
                     handleChange={handleChange}
                     handleSubmit={handleThirdStepSubmit}
                     loading={loading}
-                    goBack={() => setStep(2)}
+                    goBack={() => handleGoBack(2)}
                   />
                 </motion.div>
               )}
@@ -335,7 +356,7 @@ const Form: React.FC = () => {
                   handleChange={handleChange}
                   handleSubmit={handleFourthStepSubmit}
                   loading={loading}
-                  goBack={() => setStep(3)}
+                  goBack={() => handleGoBack(3)}
                 />
               )}
             </CardContent>
@@ -347,7 +368,7 @@ const Form: React.FC = () => {
         autoHideDuration={6000}
         onClose={() => setSnackbarOpen(false)}
       >
-        <Alert onClose={() => setSnackbarOpen(false)} severity={snackBarSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={() => setSnackbarOpen(false)} severity={snackBarSeverity}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

@@ -1,15 +1,39 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, IconButton, Popover, useMediaQuery, useTheme } from '@mui/material';
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Box, 
+  IconButton, 
+  Popover, 
+  useMediaQuery, 
+  useTheme,
+  Button,
+  Menu,
+  MenuItem 
+} from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PhoneIcon from '@mui/icons-material/Phone';
+import MenuIcon from '@mui/icons-material/Menu';
 import { motion } from 'framer-motion';
 
 const Header: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [popoverContent, setPopoverContent] = useState<string>('');
+  const [mobileMenuAnchor, setMobileMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const navItems = [
+    { label: 'Home', url: 'https://www.certifiedautoplex.com' },
+    { label: 'Inventory', url: 'https://www.certifiedautoplex.com/used-vehicles-dallas-tx' },
+    { label: 'Warranty', url: 'https://www.certifiedautoplex.com/our-warranty' },
+    { label: 'Pay Online', url: 'https://www.certifiedautoplex.com/payonline' },
+    { label: 'Finance', url: 'https://www.certifiedautoplex.com/car-loans-in-dallas-tx' },
+    { label: 'About Us', url: 'https://www.certifiedautoplex.com/about-certified-autoplex-in-dallas-tx' },
+    { label: 'Trade/Sell', url: 'https://www.certifiedautoplex.com/edmunds-trade-in' },
+  ];
 
   const handleIconClick = (event: React.MouseEvent<HTMLElement>, content: string) => {
     setAnchorEl(event.currentTarget);
@@ -35,10 +59,19 @@ const Header: React.FC = () => {
     return `${today}: ${hours[today]}`;
   };
 
+  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMobileMenuAnchor(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileMenuAnchor(null);
+  };
+
   return (
     <AppBar position="static" style={{ background: 'linear-gradient(to right, #ff0000, #000000)' }}>
-      <Toolbar>
-        <Box display="flex" justifyContent="space-between" width="100%" alignItems="center">
+      <Toolbar sx={{ flexDirection: 'column', padding: 0 }}>
+        {/* Top Bar with Logo and Icons */}
+        <Box display="flex" justifyContent="space-between" width="100%" alignItems="center" px={2} py={1}>
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -88,6 +121,65 @@ const Header: React.FC = () => {
             </motion.div>
           </Box>
         </Box>
+
+        {/* Navigation Bar */}
+        <Box 
+          width="100%" 
+          bgcolor="rgba(0, 0, 0, 0.1)"
+          display="flex"
+          justifyContent="center"
+          px={2}
+        >
+          {isMobile ? (
+            <>
+              <IconButton
+                color="inherit"
+                onClick={handleMobileMenuOpen}
+                edge="start"
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                anchorEl={mobileMenuAnchor}
+                open={Boolean(mobileMenuAnchor)}
+                onClose={handleMobileMenuClose}
+              >
+                {navItems.map((item) => (
+                  <MenuItem 
+                    key={item.label}
+                    onClick={() => {
+                      window.location.href = item.url;
+                      handleMobileMenuClose();
+                    }}
+                  >
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </>
+          ) : (
+            <Box display="flex" gap={2}>
+              {navItems.map((item) => (
+                <Button
+                  key={item.label}
+                  color="inherit"
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    }
+                  }}
+                >
+                  {item.label}
+                </Button>
+              ))}
+            </Box>
+          )}
+        </Box>
+
+        {/* Keep existing Popover component */}
         <Popover
           open={Boolean(anchorEl)}
           anchorEl={anchorEl}
