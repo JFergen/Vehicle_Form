@@ -34,9 +34,7 @@ const Carousel: React.FC = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        overflow: 'hidden',
-        height: '400px',
-        backgroundColor: '#fafafa'
+        overflow: 'hidden'
       }}
     >
       <img
