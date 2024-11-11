@@ -7,6 +7,7 @@ import Step2 from './Step2';
 import Step3 from './Step3';
 import Step4 from './Step4';
 import { motion } from 'framer-motion';
+import HowItWorks from '../Components/HowItWorks';
 
 // TODO
 // 1. When inputting make/model, have list of all potential makes and then based on that, have list of all potential models (Maybe enhancement?)
@@ -280,19 +281,38 @@ const Form: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    <Container maxWidth={false} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <Grid container justifyContent="center">
-        <Grid item xs={12} sm={8} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {!showForm && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{ width: '100%', marginBottom: '2rem' }}
-            >
-              <Carousel />
-            </motion.div>
-          )}
+        {!showForm && (
+          <>
+            <Grid item>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                style={{ width: '100%', marginBottom: '2rem' }}
+              >
+                <Carousel />
+              </motion.div>
+            </Grid>
+            <Grid item>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <HowItWorks />
+              </motion.div>
+            </Grid>
+          </>
+        )}
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+          maxWidth='sm'
+        >
           <Card style={{ width: '100%', backgroundColor: '#fff' }}>
             <CardContent style={{ paddingBottom: 16 }}>
               {step === 1 && (

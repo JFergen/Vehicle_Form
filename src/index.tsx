@@ -19,14 +19,56 @@ if (environment !== 'PROD') {
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#ff0000', // Red
+      main: '#424242', // Dark gray
+      light: '#6d6d6d',
+      dark: '#1b1b1b',
     },
     secondary: {
-      main: '#000000', // Black
+      main: '#757575', // Medium gray
+      light: '#a4a4a4',
+      dark: '#494949',
     },
     background: {
-      default: '#000000', // Black background
+      default: '#fafafa', // Almost white
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#212121',
+      secondary: '#757575',
     }
+  },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    h4: {
+      color: '#424242',
+      fontWeight: 500,
+    },
+    body1: {
+      color: '#424242',
+    }
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: 'none',
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          '&:hover': {
+            boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
+          },
+        },
+      },
+    },
   },
 });
 

@@ -5,8 +5,8 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const images = [
-  require('../images/dashboard.jpg'),
-  require('../images/driver-front-corner.jpg')
+  require('../images/carouselPicOne.jpg'),
+  require('../images/carouselPicTwo.jpg')
 ];
 
 const Carousel: React.FC = () => {
@@ -33,10 +33,8 @@ const Carousel: React.FC = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: '400px',
         overflow: 'hidden',
         borderRadius: '8px',
-        marginBottom: 2
       }}
     >
       <AnimatePresence mode='wait'>
@@ -50,7 +48,9 @@ const Carousel: React.FC = () => {
           style={{
             width: '100%',
             height: '100%',
-            objectFit: 'cover'
+            objectFit: 'contain',  // Changed from 'cover' to 'contain'
+            objectPosition: 'center',
+            backgroundColor: '#fafafa'  // Added background color
           }}
           alt={`Slide ${currentIndex + 1}`}
         />
