@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useZxing } from 'react-zxing';
-import { Dialog, DialogContent, IconButton, Box, Typography } from '@mui/material';
+import { Dialog, DialogContent, IconButton, Box, Typography, CircularProgress } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 interface BarcodeScannerProps {
@@ -11,8 +11,10 @@ interface BarcodeScannerProps {
 
 const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ open, onClose, onScan }) => {
   const [error, setError] = useState<string>('');
-  
-  const { ref } = useZxing({
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasPermission, setHasPermission] = useState(false);
+
+  const { ref, torch } = useZxing({
     onDecodeResult(result) {
       onScan(result.getText());
       onClose();
@@ -23,12 +25,36 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ open, onClose, onScan }
     },
     constraints: {
       video: {
-        facingMode: "environment",
-        width: { min: 640, ideal: 1280, max: 1920 },
-        height: { min: 480, ideal: 720, max: 1080 }
-      },
+        facingMode: { exact: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
     },
+    timeBetweenDecodingAttempts: 300,
   });
+
+  useEffect(() => {
+    if (open) {
+      setIsLoading(true);
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
+        .then(() => {
+          setHasPermission(true);
+          setError('');
+        })
+        .catch((err) => {
+          console.error('Camera permission error:', err);
+          setError('Camera access denied. Please grant camera permissions.');
+          setHasPermission(false);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [open]);
+
+  const handleVideoLoad = () => {
+    setIsLoading(false);
+  };
 
   return (
     <Dialog 
@@ -48,7 +74,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ open, onClose, onScan }
           right: 8,
           top: 8,
           color: 'white',
-          zIndex: 1
+          zIndex: 2
         }}
       >
         <CloseIcon />
@@ -68,31 +94,46 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ open, onClose, onScan }
             <Typography color="error" align="center">
               {error}
             </Typography>
+          ) : isLoading ? (
+            <CircularProgress color="primary" />
           ) : (
             <>
               <video 
-                ref={ref} 
+                ref={ref}
+                onLoadedData={handleVideoLoad}
+                autoPlay
+                playsInline
+                muted
                 style={{ 
-                  width: '100%', 
-                  maxWidth: '100vw',
-                  height: 'auto',
-                  maxHeight: '100vh',
-                  objectFit: 'contain'
-                }} 
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
               />
               <Box
                 sx={{
                   position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '80%',
+                  height: '200px',
+                  border: '2px solid white',
+                  borderRadius: '8px',
+                  boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
+                }}
+              />
+              <Typography
+                sx={{
+                  position: 'absolute',
                   bottom: 32,
-                  left: 0,
-                  right: 0,
-                  textAlign: 'center'
+                  color: 'white',
+                  textAlign: 'center',
+                  width: '100%'
                 }}
               >
-                <Typography color="white">
-                  Position the barcode within the camera view
-                </Typography>
-              </Box>
+                Position the VIN barcode within the frame
+              </Typography>
             </>
           )}
         </Box>
@@ -101,4 +142,4 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ open, onClose, onScan }
   );
 };
 
-export default BarcodeScanner; 
+export default BarcodeScanner;
