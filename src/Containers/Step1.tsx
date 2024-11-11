@@ -5,10 +5,16 @@ import DriveEtaIcon from '@mui/icons-material/DriveEta';
 import InfoIcon from '@mui/icons-material/Info';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme, useMediaQuery } from '@mui/material';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import BarcodeScanner from '../Components/BarcodeScanner';
 
 const Step1: React.FC<{ formData: any, formErrors: any, setFormErrors: any, handleChange: any, handleSubmit: any, loading: boolean }> = ({ formData, formErrors, setFormErrors, handleChange, handleSubmit, loading }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [isInputFocused, setIsInputFocused] = useState(false);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleInfoClick = (event: React.MouseEvent<HTMLElement>) => {
       setAnchorEl(event.currentTarget);
@@ -19,6 +25,16 @@ const Step1: React.FC<{ formData: any, formErrors: any, setFormErrors: any, hand
     };
 
     const open = Boolean(anchorEl);
+
+    const handleScan = (result: string) => {
+      const event = {
+        target: {
+          name: 'vin',
+          value: result
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      handleChange(event);
+    };
 
     return (
       <motion.div
@@ -112,6 +128,17 @@ const Step1: React.FC<{ formData: any, formErrors: any, setFormErrors: any, hand
                         <DriveEtaIcon color="primary" />
                       </InputAdornment>
                     ),
+                    endAdornment: isMobile && (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setIsScannerOpen(true)}
+                          edge="end"
+                          color="primary"
+                        >
+                          <QrCodeScannerIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
                     sx: {
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderWidth: '2px',
@@ -159,6 +186,12 @@ const Step1: React.FC<{ formData: any, formErrors: any, setFormErrors: any, hand
               </Typography>
             </Box>
           </Popover>
+
+          <BarcodeScanner
+            open={isScannerOpen}
+            onClose={() => setIsScannerOpen(false)}
+            onScan={handleScan}
+          />
         </>
       </motion.div>
     );
