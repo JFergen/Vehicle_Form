@@ -7,8 +7,18 @@ const Step4: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
 
   return (
     <>
-      <Typography variant='h4' gutterBottom display='flex' justifyContent='center'>
-          Final Questions
+      <Typography 
+        variant="h4" 
+        gutterBottom 
+        align="center"
+        sx={{ 
+          mb: 2,
+          fontSize: { xs: '1.5rem', sm: '2.125rem' },
+          lineHeight: { xs: 1.2, sm: 1.235 },
+          whiteSpace: { xs: 'normal', sm: 'nowrap' }
+        }}
+      >
+        Final Questions
       </Typography>
       <Divider sx={{ mb: 2, mt: 2 }} />
       <form onSubmit={handleSubmit}>

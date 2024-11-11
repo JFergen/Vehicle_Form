@@ -33,8 +33,7 @@ const Carousel: React.FC = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        overflow: 'hidden',
-        borderRadius: '8px',
+        overflow: 'hidden'
       }}
     >
       <AnimatePresence mode='wait'>
@@ -50,7 +49,8 @@ const Carousel: React.FC = () => {
             height: '100%',
             objectFit: 'contain',  // Changed from 'cover' to 'contain'
             objectPosition: 'center',
-            backgroundColor: '#fafafa'  // Added background color
+            backgroundColor: '#fafafa',  // Added background color,
+            borderRadius: '8px'
           }}
           alt={`Slide ${currentIndex + 1}`}
         />

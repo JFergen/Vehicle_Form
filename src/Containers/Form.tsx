@@ -63,8 +63,7 @@ const Form: React.FC = () => {
     exit: { opacity: 0, x: 100 },
   };
 
-  const fetchCarInfo = async (value: string) => {
-    setShowForm(true);
+  const fetchCarInfo = async (value: string) => {;
     setLoading(true);
     try {
       let response = await axios.get(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevinvalues/${value}?format=json`);
@@ -79,8 +78,10 @@ const Form: React.FC = () => {
       }));
       
       if (ErrorCode !== '0') {
+        setShowForm(false)
         handleError();
       } else {
+        setShowForm(true)
         setFormErrors('');
         setStep(2);
       }

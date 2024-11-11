@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { TextField, InputAdornment, IconButton, Popover, Typography, Box, Paper } from '@mui/material';
+import { TextField, InputAdornment, IconButton, Popover, Typography, Box, Divider } from '@mui/material';
 import { NextButton } from '../Components/Buttons';
 import DriveEtaIcon from '@mui/icons-material/DriveEta';
 import InfoIcon from '@mui/icons-material/Info';
-import { motion } from 'framer-motion';
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Step1: React.FC<{ formData: any, formErrors: any, setFormErrors: any, handleChange: any, handleSubmit: any, loading: boolean }> = ({ formData, formErrors, setFormErrors, handleChange, handleSubmit, loading }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [isInputFocused, setIsInputFocused] = useState(false);
 
     const handleInfoClick = (event: React.MouseEvent<HTMLElement>) => {
       setAnchorEl(event.currentTarget);
@@ -24,65 +26,117 @@ const Step1: React.FC<{ formData: any, formErrors: any, setFormErrors: any, hand
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <
-        >
-          <Typography variant="h5" gutterBottom align="center" sx={{ fontWeight: 500, mb: 3 }}>
+        <>
+          <Typography 
+            variant="h4" 
+            gutterBottom 
+            align="center"
+            sx={{ 
+              mb: 2,
+              fontSize: { xs: '1.5rem', sm: '2.125rem' },
+              lineHeight: { xs: 1.2, sm: 1.235 },
+              whiteSpace: { xs: 'normal', sm: 'nowrap' }
+            }}
+          >
             Enter Your Vehicle's VIN
           </Typography>
+          <Divider sx={{ mb: 2, mt: 2 }} />
           
           <Typography variant="body2" align="center" sx={{ mb: 3, color: 'text.secondary' }}>
             Found on your dashboard near the windshield or driver's side door
           </Typography>
 
-          <form onSubmit={handleSubmit}>
-            <TextField
-              label="Vehicle Identification Number (VIN)"
-              name="vin"
-              value={formData.vin}
-              onChange={handleChange}
-              fullWidth
-              variant="outlined"
-              required
-              error={!!formErrors}
-              helperText={formErrors}
-              onBlur={() => {
-                if (formData.vin.length > 0 && formData.vin.length !== 17) {
-                  setFormErrors('VIN must be 17 characters long');
-                } else {
-                  setFormErrors('');
-                }
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <DriveEtaIcon color="primary" />
-                  </InputAdornment>
-                ),
-                sx: {
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderWidth: '2px',
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'primary.main',
-                  },
-                  fontSize: '1.1rem',
-                  letterSpacing: '0.1em'
-                }
-              }}
-            />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
-              <IconButton 
-                onClick={handleInfoClick}
-                sx={{ 
-                  color: 'primary.main',
-                  '&:hover': { backgroundColor: 'rgba(66, 66, 66, 0.08)' }
-                }}
+          <Box sx={{ position: 'relative' }}>
+            <AnimatePresence>
+              {!isInputFocused && formData.vin === '' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  style={{
+                    position: 'absolute',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    top: -40,
+                    zIndex: 1
+                  }}
+                >
+                  <motion.div
+                    animate={{ y: [0, 10, 0] }}
+                    transition={{ 
+                      duration: 1.5,
+                      repeat: Infinity,
+                      repeatType: "reverse"
+                    }}
+                  >
+                    <KeyboardDoubleArrowDownIcon 
+                      sx={{ 
+                        fontSize: 40,
+                        color: 'primary.main',
+                        filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.2))'
+                      }} 
+                    />
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <form onSubmit={handleSubmit}>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
               >
-                <InfoIcon />
-              </IconButton>
-              <NextButton loading={loading} disabled={formData.vin === ''} />
-            </Box>
-          </form>
+                <TextField
+                  label="Vehicle Identification Number (VIN)"
+                  name="vin"
+                  value={formData.vin}
+                  onChange={handleChange}
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={(e) => {
+                    setIsInputFocused(false);
+                    if (e.target.value.length > 0 && e.target.value.length !== 17) {
+                      setFormErrors('VIN must be 17 characters long');
+                    } else {
+                      setFormErrors('');
+                    }
+                  }}
+                  fullWidth
+                  variant="outlined"
+                  required
+                  error={!!formErrors}
+                  helperText={formErrors}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <DriveEtaIcon color="primary" />
+                      </InputAdornment>
+                    ),
+                    sx: {
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderWidth: '2px',
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'primary.main',
+                      }
+                    }
+                  }}
+                />
+              </motion.div>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
+                <IconButton 
+                  onClick={handleInfoClick}
+                  sx={{ 
+                    color: 'primary.main',
+                    '&:hover': { backgroundColor: 'rgba(66, 66, 66, 0.08)' }
+                  }}
+                >
+                  <InfoIcon />
+                </IconButton>
+                <NextButton loading={loading} disabled={formData.vin === ''} />
+              </Box>
+            </form>
+          </Box>
 
           <Popover
             open={open}

@@ -1,14 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Box, Typography, Paper, Grid, useTheme, useMediaQuery } from '@mui/material';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 
 const HowItWorks: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  
+  // Create refs for the title and each card section
+  const titleRef = useRef(null);
+  const cardRef1 = useRef(null);
+  const cardRef2 = useRef(null);
+  const cardRef3 = useRef(null);
+  
+  // Check if elements are in view
+  const isTitleInView = useInView(titleRef, { once: true, amount: 0.5 });
+  const isCard1InView = useInView(cardRef1, { once: true, amount: 0.3 });
+  const isCard2InView = useInView(cardRef2, { once: true, amount: 0.3 });
+  const isCard3InView = useInView(cardRef3, { once: true, amount: 0.3 });
+
+  const cardRefs = [cardRef1, cardRef2, cardRef3];
+  const cardInViews = [isCard1InView, isCard2InView, isCard3InView];
 
   const steps = [
     {
@@ -34,9 +49,10 @@ const HowItWorks: React.FC = () => {
   return (
     <Box sx={{ py: 6, px: 2 }}>
       <motion.div
+        ref={titleRef}
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        animate={isTitleInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 0.8 }}
       >
         <Typography 
           variant="h3" 
@@ -58,12 +74,16 @@ const HowItWorks: React.FC = () => {
         {steps.map((step, index) => (
           <Grid item xs={12} sm={4} key={index}>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.2 }}
-              onHoverStart={() => setHoveredCard(index)}
-              onHoverEnd={() => setHoveredCard(null)}
-              whileHover={{ scale: 1.05 }}
+              ref={cardRefs[index]}
+              initial={{ opacity: 0, y: 50 }}
+              animate={cardInViews[index] ? 
+                { opacity: 1, y: 0 } : 
+                { opacity: 0, y: 50 }
+              }
+              whileHover={!isMobile ? { scale: 1.05 } : undefined}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              onHoverStart={() => !isMobile && setHoveredCard(index)}
+              onHoverEnd={() => !isMobile && setHoveredCard(null)}
             >
               <Paper
                 elevation={hoveredCard === index ? 8 : 2}
@@ -74,28 +94,16 @@ const HowItWorks: React.FC = () => {
                   flexDirection: 'column',
                   alignItems: 'center',
                   textAlign: 'center',
-                  position: 'relative',
-                  overflow: 'hidden',
                   background: 'rgba(255, 255, 255, 0.9)',
                   backdropFilter: 'blur(10px)',
                   borderRadius: '16px',
-                  transition: 'all 0.3s ease-in-out',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'linear-gradient(45deg, rgba(66, 66, 66, 0.05) 0%, rgba(117, 117, 117, 0.05) 100%)',
-                    zIndex: 0,
-                  }
+                  transition: 'all 0.3s ease-in-out'
                 }}
               >
                 <motion.div
-                  animate={{
-                    rotateY: hoveredCard === index ? 360 : 0
-                  }}
+                  animate={isMobile ? 
+                    (cardInViews[index] ? { rotateY: 360 } : { rotateY: 0 }) :
+                    (hoveredCard === index ? { rotateY: 360 } : { rotateY: 0 })}
                   transition={{ duration: 0.6 }}
                   style={{ color: theme.palette.primary.main, marginBottom: '1rem' }}
                 >
@@ -107,9 +115,15 @@ const HowItWorks: React.FC = () => {
                 <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
                   {step.description}
                 </Typography>
-                <Typography variant="body1" sx={{ color: theme.palette.text.primary }}>
-                  {step.benefit}
-                </Typography>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <Typography variant="body1" sx={{ color: theme.palette.text.primary, mt: 2 }}>
+                    {step.benefit}
+                  </Typography>
+                </motion.div>
               </Paper>
             </motion.div>
           </Grid>

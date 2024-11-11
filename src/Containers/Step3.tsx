@@ -16,10 +16,20 @@ const Step3: React.FC<{ formData: any, handleChange: any, handleSubmit: any, loa
       flexDirection="column"
       alignItems="center"
     > 
-      <Typography variant="h4" gutterBottom>
+      <Typography 
+        variant="h4" 
+        gutterBottom 
+        align="center"
+        sx={{ 
+          mb: 2,
+          fontSize: { xs: '1.5rem', sm: '2.125rem' },
+          lineHeight: { xs: 1.2, sm: 1.235 },
+          whiteSpace: { xs: 'normal', sm: 'nowrap' }
+        }}
+      >
         Upload Photos
       </Typography>
-      <Divider sx={{ margin: '16px 0' }} flexItem />
+      <Divider sx={{ mb: 2, mt: 2 }} />
       <PhotoUpload
         title="Odometer"
         photo={formData.odometerPhoto}

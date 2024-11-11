@@ -74,12 +74,12 @@ const Header: React.FC = () => {
         position="static" 
         sx={{ 
           bgcolor: '#424242',
-          height: '40px',
+          height: { xs: '50px', sm: '40px' },
           justifyContent: 'center'
         }}
       >
         <Toolbar sx={{ 
-          minHeight: '40px !important', 
+          minHeight: { xs: '50px !important', sm: '40px !important' }, 
           display: 'flex', 
           justifyContent: 'flex-end',
           maxWidth: '1200px',
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
             display: 'flex', 
             justifyContent: 'flex-end',
             gap: 0.5,
-            pr: { xs: 0.5, sm: 0 }
+            pr: { xs: 5, sm: 0 }
           }}>
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <IconButton onClick={(e) => handleIconClick(e, 'Sales Phone: 972-231-3777')}>
@@ -118,81 +118,120 @@ const Header: React.FC = () => {
         sx={{ 
           bgcolor: 'white',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          color: '#424242'
+          color: '#424242',
+          height: { xs: '70px', sm: 'auto' }
         }}
       >
         <Toolbar>
           <Box sx={{ 
             display: 'flex', 
-            justifyContent: 'space-between', 
             alignItems: 'center',
-            width: '100%',
-            maxWidth: '1200px',
-            margin: '0 auto',
-            px: 2,
-            py: 1
+            justifyContent: isMobile ? 'space-between' : 'flex-start',
+            flex: isMobile ? 1 : 'auto'
           }}>
             <a href="https://www.certifiedautoplex.com" target="_blank" rel="noopener noreferrer">
               <img
                 src={require('../images/CertifiedAutoplex.png')}
                 alt="Logo"
                 style={{
-                  height: isMobile ? 40 : 50,
+                  height: isMobile ? 45 : 50,
                   marginRight: isMobile ? 0 : 24
                 }}
               />
             </a>
-            
-            {!isMobile && (
-              <Box sx={{ display: 'flex', gap: 3 }}>
-                {navItems.map((item) => (
-                  <Typography 
-                    key={item.label}
-                    component="a"
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{ 
-                      color: '#424242', 
-                      cursor: 'pointer',
-                      textDecoration: 'none',
-                      '&:hover': {
-                        color: '#000000'
-                      }
-                    }}
-                  >
-                    {item.label}
-                  </Typography>
-                ))}
-              </Box>
+            {isMobile && (
+              <IconButton
+                edge="end"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleMobileMenuOpen}
+                sx={{ px: 3 }}
+              >
+                <MenuIcon />
+              </IconButton>
             )}
-
-            {/* Keep existing Popover component */}
-            <Popover
-              open={Boolean(anchorEl)}
-              anchorEl={anchorEl}
-              onClose={handleClose}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-              disableScrollLock
-            >
-              {popoverContent.includes('Address') ? (
-                <Typography sx={{ p: 2 }}>
-                  Address: <a href="https://www.google.com/maps/search/?api=1&query=Certified+Autoplex,+Dallas,+TX" target="_blank" rel="noopener noreferrer">
-                    3340 Belt Line Rd, Dallas, TX
-                  </a>
-                </Typography>
-              ) : popoverContent.includes('Phone') ? (
-                <Typography sx={{ p: 2 }}>
-                  Sales Phone: <a href="tel:972-231-3777">972-231-3777</a>
-                </Typography>
-              ) : (
-                <Typography sx={{ p: 2 }}>{popoverContent}</Typography>
-              )}
-            </Popover>
           </Box>
+          {!isMobile && (
+            <Box sx={{ display: 'flex', gap: 3 }}>
+              {navItems.map((item) => (
+                <Typography 
+                  key={item.label}
+                  component="a"
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ 
+                    color: '#424242', 
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    '&:hover': {
+                      color: '#000000'
+                    }
+                  }}
+                >
+                  {item.label}
+                </Typography>
+              ))}
+            </Box>
+          )}
+
+          {/* Keep existing Popover component */}
+          <Popover
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            disableScrollLock
+          >
+            {popoverContent.includes('Address') ? (
+              <Typography sx={{ p: 2 }}>
+                Address: <a href="https://www.google.com/maps/search/?api=1&query=Certified+Autoplex,+Dallas,+TX" target="_blank" rel="noopener noreferrer">
+                  3340 Belt Line Rd, Dallas, TX
+                </a>
+              </Typography>
+            ) : popoverContent.includes('Phone') ? (
+              <Typography sx={{ p: 2 }}>
+                Sales Phone: <a href="tel:972-231-3777">972-231-3777</a>
+              </Typography>
+            ) : (
+              <Typography sx={{ p: 2 }}>{popoverContent}</Typography>
+            )}
+          </Popover>
         </Toolbar>
       </AppBar>
+
+      {/* Mobile Menu */}
+      <Menu
+        anchorEl={mobileMenuAnchor}
+        open={Boolean(mobileMenuAnchor)}
+        onClose={handleMobileMenuClose}
+        sx={{
+          display: { xs: 'block', sm: 'none' }
+        }}
+        disableScrollLock
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        {navItems.map((item) => (
+          <MenuItem 
+            key={item.label}
+            onClick={handleMobileMenuClose}
+            component="a"
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ 
+              color: '#424242',
+              '&:hover': {
+                backgroundColor: 'rgba(66, 66, 66, 0.08)'
+              }
+            }}
+          >
+            {item.label}
+          </MenuItem>
+        ))}
+      </Menu>
     </>
   );
 };
