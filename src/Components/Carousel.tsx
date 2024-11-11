@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton } from '@mui/material';
-import { motion, AnimatePresence } from 'framer-motion';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-const images = [
-  require('../images/carouselPicOne.jpg'),
-  require('../images/carouselPicTwo.jpg')
-];
+// Import images directly - adjust these paths to match your project structure
+import carouselPicOne from '../images/carouselPicOne.jpg';
+import carouselPicTwo from '../images/carouselPicTwo.jpg';
+
+// Create array after imports
+const images = [carouselPicOne, carouselPicTwo];
 
 const Carousel: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -18,7 +19,7 @@ const Carousel: React.FC = () => {
     }, 5000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [currentIndex]);
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -33,28 +34,22 @@ const Carousel: React.FC = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        height: '400px',
+        backgroundColor: '#fafafa'
       }}
     >
-      <AnimatePresence mode='wait'>
-        <motion.img
-          key={currentIndex}
-          src={images[currentIndex]}
-          initial={{ opacity: 0, x: 300 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -300 }}
-          transition={{ duration: 0.5 }}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'contain',  // Changed from 'cover' to 'contain'
-            objectPosition: 'center',
-            backgroundColor: '#fafafa',  // Added background color,
-            borderRadius: '8px'
-          }}
-          alt={`Slide ${currentIndex + 1}`}
-        />
-      </AnimatePresence>
+      <img
+        src={images[currentIndex]}
+        alt={`Slide ${currentIndex + 1}`}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          objectPosition: 'center',
+          transition: 'opacity 0.5s ease-in-out'
+        }}
+      />
       <IconButton
         onClick={handlePrevious}
         sx={{
