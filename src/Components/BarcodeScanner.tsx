@@ -28,6 +28,24 @@ const BarcodeScannerComponent: React.FC<BarcodeScannerProps> = ({ open, onClose,
     };
   }, []);
 
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
@@ -41,7 +59,8 @@ const BarcodeScannerComponent: React.FC<BarcodeScannerProps> = ({ open, onClose,
         backgroundColor: 'black',
         zIndex: 9999,
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        touchAction: 'none'
       }}
     >
       <IconButton
