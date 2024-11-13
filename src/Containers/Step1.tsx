@@ -7,7 +7,7 @@ import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrow
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme, useMediaQuery } from '@mui/material';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-import BarcodeScanner from '../Components/BarcodeScanner';
+import BarcodeScannerComponent from '../Components/BarcodeScanner';
 
 const Step1: React.FC<{ formData: any, formErrors: any, setFormErrors: any, handleChange: any, handleSubmit: any, loading: boolean }> = ({ formData, formErrors, setFormErrors, handleChange, handleSubmit, loading }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -187,7 +187,7 @@ const Step1: React.FC<{ formData: any, formErrors: any, setFormErrors: any, hand
             </Box>
           </Popover>
 
-          <BarcodeScanner
+          <BarcodeScannerComponent
             open={isScannerOpen}
             onClose={() => setIsScannerOpen(false)}
             onScan={handleScan}

@@ -282,8 +282,8 @@ const Form: React.FC = () => {
   };
 
   return (
-    <Container maxWidth={false} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <Grid container justifyContent="center">
+    <Container maxWidth={false} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 0 }}>
+      <Grid container justifyContent="center" padding={0}>
         {!showForm && (
           <>
             <Grid item>

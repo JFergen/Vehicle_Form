@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useZxing } from 'react-zxing';
-import { Dialog, DialogContent, IconButton, Box, Typography, CircularProgress } from '@mui/material';
+import { IconButton, useMediaQuery, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { BarcodeScanner } from 'react-barcode-scanner';
 
 interface BarcodeScannerProps {
   open: boolean;
@@ -9,137 +9,99 @@ interface BarcodeScannerProps {
   onScan: (result: string) => void;
 }
 
-const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ open, onClose, onScan }) => {
-  const [error, setError] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasPermission, setHasPermission] = useState(false);
-
-  const { ref, torch } = useZxing({
-    onDecodeResult(result) {
-      onScan(result.getText());
-      onClose();
-    },
-    onError(error) {
-      console.error("Scanner Error:", error);
-      setError("Failed to access camera. Please ensure camera permissions are granted.");
-    },
-    constraints: {
-      video: {
-        facingMode: { exact: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      }
-    },
-    timeBetweenDecodingAttempts: 300,
-  });
+const BarcodeScannerComponent: React.FC<BarcodeScannerProps> = ({ open, onClose, onScan }) => {
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>(
+    window.innerHeight > window.innerWidth ? 'portrait' : 'landscape'
+  );
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
-    if (open) {
-      setIsLoading(true);
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
-        .then(() => {
-          setHasPermission(true);
-          setError('');
-        })
-        .catch((err) => {
-          console.error('Camera permission error:', err);
-          setError('Camera access denied. Please grant camera permissions.');
-          setHasPermission(false);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
-  }, [open]);
+    const handleOrientationChange = () => {
+      setOrientation(window.innerHeight > window.innerWidth ? 'portrait' : 'landscape');
+    };
 
-  const handleVideoLoad = () => {
-    setIsLoading(false);
-  };
+    window.addEventListener('resize', handleOrientationChange);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+      window.removeEventListener('orientationchange', handleOrientationChange);
+    };
+  }, []);
+
+  if (!open) return null;
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose}
-      fullScreen
-      PaperProps={{
-        style: {
-          background: 'black'
-        }
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'black',
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
       <IconButton
         onClick={onClose}
-        sx={{
+        style={{
           position: 'absolute',
-          right: 8,
-          top: 8,
+          top: orientation === 'portrait' ? 16 : 8,
+          right: orientation === 'portrait' ? 16 : 8,
           color: 'white',
-          zIndex: 2
+          zIndex: 10000
         }}
       >
         <CloseIcon />
       </IconButton>
-      <DialogContent>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-            position: 'relative'
+      
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: orientation === 'portrait' ? '80%' : '50%',
+          maxWidth: orientation === 'portrait' ? '300px' : '500px',
+          height: orientation === 'portrait' ? '100px' : '80px',
+          border: '2px solid white',
+          borderRadius: '8px',
+          zIndex: 10000,
+          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <div
+          style={{
+            width: '90%',
+            height: '2px',
+            backgroundColor: 'red',
+            position: 'absolute'
           }}
-        >
-          {error ? (
-            <Typography color="error" align="center">
-              {error}
-            </Typography>
-          ) : isLoading ? (
-            <CircularProgress color="primary" />
-          ) : (
-            <>
-              <video 
-                ref={ref}
-                onLoadedData={handleVideoLoad}
-                autoPlay
-                playsInline
-                muted
-                style={{ 
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-              />
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: '80%',
-                  height: '200px',
-                  border: '2px solid white',
-                  borderRadius: '8px',
-                  boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
-                }}
-              />
-              <Typography
-                sx={{
-                  position: 'absolute',
-                  bottom: 32,
-                  color: 'white',
-                  textAlign: 'center',
-                  width: '100%'
-                }}
-              >
-                Position the VIN barcode within the frame
-              </Typography>
-            </>
-          )}
-        </Box>
-      </DialogContent>
-    </Dialog>
+        />
+      </div>
+      
+      <BarcodeScanner
+        options={{ formats: ['code_39'] }}
+        onCapture={(result) => {
+          onScan(result[0].rawValue);
+          onClose();
+        }}
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: orientation === 'portrait' ? 'cover' : 'contain'
+        }}
+      />
+    </div>
   );
 };
 
-export default BarcodeScanner;
+export default BarcodeScannerComponent;

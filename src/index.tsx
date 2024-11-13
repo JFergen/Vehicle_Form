@@ -6,6 +6,7 @@ import Form from './Containers/Form';
 import Footer from './Components/Footer';
 import { motion } from 'framer-motion';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Box } from '@mui/material';
 
 // Set the document title based on the environment variable
 const environment = process.env.REACT_APP_ENVIRONMENT || 'Development';
@@ -72,6 +73,21 @@ const theme = createTheme({
   },
 });
 
+// Add this code block for Eruda
+if (process.env.NODE_ENV === 'development') {
+  const eruda = require('eruda');
+  eruda.init({
+    tool: ['console', 'elements', 'network', 'resources', 'info'],
+    useShadowDom: true,
+    autoScale: true,
+    defaults: {
+      displaySize: 50,
+      transparency: 0.9,
+      theme: 'Material Dark'
+    }
+  });
+}
+
 const rootElement = document.getElementById('root');
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -85,9 +101,16 @@ if (rootElement) {
       <ThemeProvider theme={theme}>
         <motion.div variants={containerVariants} initial="hidden" animate="visible" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <Header />
-          <div style={{ display: 'flex', flex: 1, marginTop: 20 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flex: 1,
+            marginTop: {
+              xs: 0,  // No margin on mobile
+              sm: '20px'  // 20px margin on screens >= 600px (sm breakpoint)
+            }
+          }}>
             <Form />
-          </div>
+          </Box>
           <Footer />
         </motion.div>
       </ThemeProvider>
