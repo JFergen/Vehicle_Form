@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IconButton, useMediaQuery, useTheme } from '@mui/material';
+import { IconButton, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { BarcodeScanner } from 'react-barcode-scanner';
 
@@ -14,7 +14,6 @@ const BarcodeScannerComponent: React.FC<BarcodeScannerProps> = ({ open, onClose,
     window.innerHeight > window.innerWidth ? 'portrait' : 'landscape'
   );
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     const handleOrientationChange = () => {
