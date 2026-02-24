@@ -68,6 +68,19 @@ const HowItWorks: React.FC = () => {
         >
           Get Your Cash Offer Today
         </Typography>
+
+        <Typography
+          variant="h6"
+          align="center"
+          sx={{
+            mt: 1,
+            mb: 4,
+            color: theme.palette.primary.main,
+            fontWeight: 600,
+          }}
+        >
+          If we don't meet or beat Carmax offer we'll write you a check for $500
+        </Typography>
       </motion.div>
 
       <Grid container spacing={4} justifyContent="center">
